@@ -1,6 +1,6 @@
 ﻿# Windows桌面整理工具（專案藍圖）
 
-> 本檔為跨 Agent 通用的專案藍圖（AGENTS.md 開放標準）。任何 Agent 的每個 session 都應先讀本檔＋handoff.md。
+> 本檔為跨 Agent 通用的專案藍圖（AGENTS.md 開放標準）。任何 Agent 的每個 session 都應先讀本檔＋`handoff.md`。
 
 ## 專案簡介
 為 Windows 11 打造的輕量、高效、免安裝（Portable）桌面管理與分區收納工具（WinDeskFence）。支援 Fluent Acrylic 毛玻璃質感、自訂資料夾映射收納盒（Folder Portal，支援展示子資料夾與檔案並快速啟動）、開機自動啟動、手動一鍵整理與 100% 離線資安防護。
@@ -16,25 +16,25 @@
 - [ ] 階段四：開機自啟管理、設定介面、一鍵手動整理與 Portable 單檔打包
 
 ## 資料夾結構
-`
+```
 Windows桌面整理工具/
 ├── .agents/
 │   └── AGENTS.md        # 專案藍圖（開放標準）
 ├── agents.md            # 專案藍圖（根目錄相容）
 ├── handoff.md           # 跨 Agent / 跨電腦交接檔
 └── .gitignore           # Git 忽略設定檔
-`
+```
 
 ## 同步層級（本專案初始化至第 3 層級）
 
 | 層級 | 平台 | 位置 | 讀取時機 |
 |------|------|------|---------|
-| L1 | 本地（GDrive） | gents.md＋handoff.md | 每個 session |
+| L1 | 本地（GDrive） | `agents.md`＋`handoff.md` | 每個 session |
 | L2 | GitHub | https://github.com/baron0607/windows-desktop-organizer | 指定時 |
 | L3 | Obsidian | 原始資料/AI專案資料夾/Windows桌面整理工具/專案工作流程.md | 有需要時 |
 
 ## 工作約定
-- 任何 Agent、任何電腦：**開工先讀 handoff.md，收工必更新 handoff.md**
+- 任何 Agent、任何電腦：**開工先讀 `handoff.md`，收工必更新 `handoff.md`**
 - 修改共用檔案前先讀最新內容，避免覆蓋其他 Agent 的變更
 - 所有回應與文件使用繁體中文
 - 修改前先確認計畫，優先保留原有資料結構
