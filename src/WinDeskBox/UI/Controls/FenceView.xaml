@@ -129,6 +129,10 @@
 
                     <!-- 工具按鈕群 -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- 設定此收納盒 -->
+                        <Button x:Name="BtnSettings" Style="{DynamicResource FluentIconButton}" ToolTip="設定此收納盒與資料夾映射" Click="BtnSettings_Click" Width="26" Height="26">
+                            <TextBlock Text="⚙️" FontSize="11" Foreground="#CCCCCC" />
+                        </Button>
                         <!-- 切換排列模式 (Grid / List) -->
                         <Button x:Name="BtnToggleView" Style="{DynamicResource FluentIconButton}" ToolTip="切換大圖示/清單" Click="BtnToggleView_Click" Width="26" Height="26">
                             <TextBlock Text="⊞" FontSize="14" Foreground="#CCCCCC" />

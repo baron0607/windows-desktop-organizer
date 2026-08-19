@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -473,6 +473,14 @@ namespace WinDeskBox.UI.Controls
             Config.Top = Top;
             Config.Width = Width;
             if (!_isCollapsed) Config.Height = Height;
+        }
+
+        private void BtnSettings_Click(object sender, RoutedEventArgs e)
+        {
+            if (Application.Current is App app)
+            {
+                app.OpenSettingsForBox(Config.Id);
+            }
         }
 
         private void BtnToggleView_Click(object sender, RoutedEventArgs e)

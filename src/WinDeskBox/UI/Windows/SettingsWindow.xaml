@@ -23,7 +23,7 @@
         </StackPanel>
 
         <!-- 設定分頁 TabControl -->
-        <TabControl Grid.Row="1" Background="#282828" BorderBrush="#35FFFFFF" BorderThickness="1">
+        <TabControl x:Name="MainTabControl" Grid.Row="1" Background="#282828" BorderBrush="#35FFFFFF" BorderThickness="1">
             <!-- 一般設定 -->
             <TabItem Header="⚙️ 一般設定">
                 <StackPanel Margin="15">

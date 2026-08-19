@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
@@ -94,14 +94,24 @@ namespace WinDeskBox
             }
         }
 
-        private void OpenSettingsWindow()
+        public void ReloadAllFences()
         {
-            var settings = new SettingsWindow(_config);
+            _config = ConfigManager.Load();
+            LaunchAllFences();
+        }
+
+        public void OpenSettingsForBox(string? boxId = null)
+        {
+            var settings = new SettingsWindow(_config, boxId);
             if (settings.ShowDialog() == true)
             {
-                _config = ConfigManager.Load();
-                LaunchAllFences();
+                ReloadAllFences();
             }
+        }
+
+        private void OpenSettingsWindow()
+        {
+            OpenSettingsForBox(null);
         }
 
         private void AddNewBox()

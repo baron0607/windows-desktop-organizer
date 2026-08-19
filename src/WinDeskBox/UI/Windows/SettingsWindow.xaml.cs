@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
@@ -15,7 +15,7 @@ namespace WinDeskBox.UI.Windows
         private readonly ObservableCollection<BoxConfig> _boxes = new();
         private readonly ObservableCollection<TabConfig> _tabs = new();
 
-        public SettingsWindow(AppConfig config)
+        public SettingsWindow(AppConfig config, string? targetBoxId = null)
         {
             InitializeComponent();
             _config = config;
@@ -33,7 +33,34 @@ namespace WinDeskBox.UI.Windows
             LstBoxes.ItemsSource = _boxes;
             LstTabs.ItemsSource = _tabs;
 
-            if (_boxes.Count > 0)
+            // 即時同步分頁名稱與路徑文字輸入
+            TxtTabName.TextChanged += (s, e) =>
+            {
+                if (LstTabs.SelectedItem is TabConfig tab)
+                {
+                    tab.Name = TxtTabName.Text;
+                    LstTabs.Items.Refresh();
+                }
+            };
+            TxtTabFolder.TextChanged += (s, e) =>
+            {
+                if (LstTabs.SelectedItem is TabConfig tab)
+                {
+                    tab.FolderPath = TxtTabFolder.Text;
+                }
+            };
+
+            // 若有指定目標收納盒，直接切換至第二分頁並選取該收納盒
+            if (!string.IsNullOrEmpty(targetBoxId))
+            {
+                MainTabControl.SelectedIndex = 1;
+                var target = _boxes.FirstOrDefault(b => b.Id == targetBoxId);
+                if (target != null)
+                {
+                    LstBoxes.SelectedItem = target;
+                }
+            }
+            else if (_boxes.Count > 0)
             {
                 LstBoxes.SelectedIndex = 0;
             }
