@@ -4,3 +4,11 @@
 .env
 *.key
 credentials.*
+
+# .NET build artifacts
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+.vs/
+build/
