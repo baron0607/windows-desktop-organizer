@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
@@ -14,6 +15,7 @@ namespace WinDeskBox.UI.Windows
         private readonly AppConfig _config;
         private readonly ObservableCollection<BoxConfig> _boxes = new();
         private readonly ObservableCollection<TabConfig> _tabs = new();
+        private bool _isUpdatingUi = false;
 
         public SettingsWindow(AppConfig config, string? targetBoxId = null)
         {
@@ -36,14 +38,17 @@ namespace WinDeskBox.UI.Windows
             // 即時同步分頁名稱與路徑文字輸入
             TxtTabName.TextChanged += (s, e) =>
             {
+                if (_isUpdatingUi) return;
                 if (LstTabs.SelectedItem is TabConfig tab)
                 {
                     tab.Name = TxtTabName.Text;
                     LstTabs.Items.Refresh();
                 }
             };
+
             TxtTabFolder.TextChanged += (s, e) =>
             {
+                if (_isUpdatingUi) return;
                 if (LstTabs.SelectedItem is TabConfig tab)
                 {
                     tab.FolderPath = TxtTabFolder.Text;
@@ -99,8 +104,10 @@ namespace WinDeskBox.UI.Windows
             if (LstTabs.SelectedItem is TabConfig tab)
             {
                 TabDetailPanel.Visibility = Visibility.Visible;
+                _isUpdatingUi = true;
                 TxtTabName.Text = tab.Name;
                 TxtTabFolder.Text = tab.FolderPath;
+                _isUpdatingUi = false;
             }
             else
             {
@@ -175,7 +182,10 @@ namespace WinDeskBox.UI.Windows
             {
                 if (SecurityGuard.ValidateFolderPath(dialog.FolderName, out string sanitized))
                 {
+                    _isUpdatingUi = true;
                     TxtTabFolder.Text = sanitized;
+                    _isUpdatingUi = false;
+
                     if (LstTabs.SelectedItem is TabConfig tab)
                     {
                         tab.FolderPath = sanitized;
