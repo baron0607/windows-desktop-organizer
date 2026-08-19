@@ -1,4 +1,4 @@
-﻿<Window x:Class="WinDeskBox.UI.Controls.FenceView"
+<Window x:Class="WinDeskBox.UI.Controls.FenceView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:WinDeskBox.UI.Controls"
         mc:Ignorable="d"
         Title="WinDeskBox"
+        Icon="pack://application:,,,/Assets/app.ico"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"

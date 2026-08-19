@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,7 +9,7 @@ using WinDeskBox.Core;
 namespace WinDeskBox.UI.Tray
 {
     /// <summary>
-    /// 純 Win32 Shell_NotifyIcon 系統匣管理器，原生整合 WPF 現代化右鍵選單
+    /// 純 Win32 Shell_NotifyIcon 系統匣管理器，原生整合自訂圖示與 WPF 現代化右鍵選單
     /// </summary>
     public class TrayIconManager : IDisposable
     {
@@ -34,6 +35,7 @@ namespace WinDeskBox.UI.Tray
         private readonly Action<bool> _onToggleLockAll;
         private readonly Action _onExit;
 
+        private IntPtr _hTrayIcon = IntPtr.Zero;
         private bool _isAllLocked = false;
         private MenuItem? _lockMenuItem;
 
@@ -125,7 +127,27 @@ namespace WinDeskBox.UI.Tray
 
         private void AddTrayIcon()
         {
-            IntPtr hIcon = LoadIcon(IntPtr.Zero, (IntPtr)IDI_APPLICATION);
+            _hTrayIcon = IntPtr.Zero;
+
+            // 優先從當前執行檔擷取內嵌之 WinDeskBox 專屬高畫質圖示
+            try
+            {
+                string exePath = Environment.ProcessPath ?? "";
+                if (!string.IsNullOrEmpty(exePath) && File.Exists(exePath))
+                {
+                    ExtractIconEx(exePath, 0, out IntPtr hLarge, out IntPtr hSmall, 1);
+                    _hTrayIcon = (hSmall != IntPtr.Zero) ? hSmall : hLarge;
+                }
+            }
+            catch
+            {
+                // 忽略錯誤並降級回通用圖示
+            }
+
+            if (_hTrayIcon == IntPtr.Zero)
+            {
+                _hTrayIcon = LoadIcon(IntPtr.Zero, (IntPtr)IDI_APPLICATION);
+            }
 
             var nid = new NOTIFYICONDATA
             {
@@ -134,7 +156,7 @@ namespace WinDeskBox.UI.Tray
                 uID = 1,
                 uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP,
                 uCallbackMessage = WM_TRAYICON,
-                hIcon = hIcon,
+                hIcon = _hTrayIcon,
                 szTip = "WinDeskBox 桌面收納箱"
             };
 
@@ -151,6 +173,12 @@ namespace WinDeskBox.UI.Tray
             };
 
             Shell_NotifyIcon(NIM_DELETE, ref nid);
+
+            if (_hTrayIcon != IntPtr.Zero)
+            {
+                DestroyIcon(_hTrayIcon);
+                _hTrayIcon = IntPtr.Zero;
+            }
         }
 
         private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -207,8 +235,15 @@ namespace WinDeskBox.UI.Tray
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
         private static extern bool Shell_NotifyIcon(uint dwMessage, ref NOTIFYICONDATA lpData);
 
+        [DllImport("shell32.dll", CharSet = CharSet.Auto)]
+        private static extern uint ExtractIconEx(string szFileName, int nIconIndex, out IntPtr phiconLarge, out IntPtr phiconSmall, uint nIcons);
+
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr LoadIcon(IntPtr hInstance, IntPtr lpIconName);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool DestroyIcon(IntPtr hIcon);
 
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
