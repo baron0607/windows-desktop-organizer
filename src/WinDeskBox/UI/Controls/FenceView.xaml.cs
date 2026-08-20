@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -44,12 +45,7 @@ namespace WinDeskBox.UI.Controls
             // 2. 釘在桌面底層圖層 (WorkerW / HWND_BOTTOM)
             DesktopWorker.PinToDesktopBottom(this);
 
-            // 3. 掛載 Win32 訊息攔截以支援上下左右邊框 8 向自由拉伸
-            var helper = new WindowInteropHelper(this);
-            var source = HwndSource.FromHwnd(helper.Handle);
-            source?.AddHook(WndProc);
-
-            // 4. 恢復幾何尺寸與座標
+            // 3. 恢復幾何尺寸與座標
             ScreenBoundsGuard.ClampToScreen(Config);
             Left = Config.Left;
             Top = Config.Top;
@@ -84,49 +80,83 @@ namespace WinDeskBox.UI.Controls
             }
         }
 
-        #region Win32 8 向邊界感應拉伸調整尺寸
-        private const int WM_NCHITTEST = 0x0084;
-        private const int HTLEFT = 10;
-        private const int HTRIGHT = 11;
-        private const int HTTOP = 12;
-        private const int HTTOPLEFT = 13;
-        private const int HTTOPRIGHT = 14;
-        private const int HTBOTTOM = 15;
-        private const int HTBOTTOMLEFT = 16;
-        private const int HTBOTTOMRIGHT = 17;
-
-        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        #region 原生 8 向邊框拉伸縮放處理常式 (WPF Thumb DragDelta)
+        private void Resize_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            if (msg == WM_NCHITTEST)
+            if (Config.IsLocked || _isCollapsed) return;
+
+            if (sender is FrameworkElement thumb && thumb.Tag is string direction)
             {
-                if (Config.IsLocked || _isCollapsed)
+                switch (direction)
                 {
-                    return IntPtr.Zero;
+                    case "Right":
+                        Width = Math.Max(MinWidth, Width + e.HorizontalChange);
+                        break;
+                    case "Bottom":
+                        Height = Math.Max(MinHeight, Height + e.VerticalChange);
+                        _expandedHeight = Height;
+                        break;
+                    case "Left":
+                        double newWidthL = Width - e.HorizontalChange;
+                        if (newWidthL >= MinWidth)
+                        {
+                            Left += e.HorizontalChange;
+                            Width = newWidthL;
+                        }
+                        break;
+                    case "Top":
+                        double newHeightT = Height - e.VerticalChange;
+                        if (newHeightT >= MinHeight)
+                        {
+                            Top += e.VerticalChange;
+                            Height = newHeightT;
+                            _expandedHeight = Height;
+                        }
+                        break;
+                    case "BottomRight":
+                        Width = Math.Max(MinWidth, Width + e.HorizontalChange);
+                        Height = Math.Max(MinHeight, Height + e.VerticalChange);
+                        _expandedHeight = Height;
+                        break;
+                    case "BottomLeft":
+                        double newWidthBL = Width - e.HorizontalChange;
+                        if (newWidthBL >= MinWidth)
+                        {
+                            Left += e.HorizontalChange;
+                            Width = newWidthBL;
+                        }
+                        Height = Math.Max(MinHeight, Height + e.VerticalChange);
+                        _expandedHeight = Height;
+                        break;
+                    case "TopRight":
+                        Width = Math.Max(MinWidth, Width + e.HorizontalChange);
+                        double newHeightTR = Height - e.VerticalChange;
+                        if (newHeightTR >= MinHeight)
+                        {
+                            Top += e.VerticalChange;
+                            Height = newHeightTR;
+                            _expandedHeight = Height;
+                        }
+                        break;
+                    case "TopLeft":
+                        double newWidthTL = Width - e.HorizontalChange;
+                        if (newWidthTL >= MinWidth)
+                        {
+                            Left += e.HorizontalChange;
+                            Width = newWidthTL;
+                        }
+                        double newHeightTL = Height - e.VerticalChange;
+                        if (newHeightTL >= MinHeight)
+                        {
+                            Top += e.VerticalChange;
+                            Height = newHeightTL;
+                            _expandedHeight = Height;
+                        }
+                        break;
                 }
 
-                int x = (short)(lParam.ToInt32() & 0xFFFF);
-                int y = (short)((lParam.ToInt32() >> 16) & 0xFFFF);
-
-                Point pt = PointFromScreen(new Point(x, y));
-                double w = ActualWidth;
-                double h = ActualHeight;
-                double b = 7; // 邊框感應厚度 7px
-
-                bool left = pt.X <= b;
-                bool right = pt.X >= w - b;
-                bool top = pt.Y <= b;
-                bool bottom = pt.Y >= h - b;
-
-                if (top && left) { handled = true; return (IntPtr)HTTOPLEFT; }
-                if (top && right) { handled = true; return (IntPtr)HTTOPRIGHT; }
-                if (bottom && left) { handled = true; return (IntPtr)HTBOTTOMLEFT; }
-                if (bottom && right) { handled = true; return (IntPtr)HTBOTTOMRIGHT; }
-                if (left) { handled = true; return (IntPtr)HTLEFT; }
-                if (right) { handled = true; return (IntPtr)HTRIGHT; }
-                if (top) { handled = true; return (IntPtr)HTTOP; }
-                if (bottom) { handled = true; return (IntPtr)HTBOTTOM; }
+                SavePosition();
             }
-            return IntPtr.Zero;
         }
         #endregion
 
@@ -581,6 +611,10 @@ namespace WinDeskBox.UI.Controls
                 ? "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
                 : "M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10A2,2 0 0,1 6,8H15V6A3,3 0 0,0 12,3A3,3 0 0,0 9,6H7A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17Z");
             PathLockIcon.Opacity = locked ? 1.0 : 0.7;
+            if (ResizeGrid != null)
+            {
+                ResizeGrid.Visibility = locked ? Visibility.Collapsed : Visibility.Visible;
+            }
         }
 
         private void BtnRollup_Click(object sender, RoutedEventArgs e)

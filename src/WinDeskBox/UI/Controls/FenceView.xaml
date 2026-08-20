@@ -1,4 +1,4 @@
-﻿<Window x:Class="WinDeskBox.UI.Controls.FenceView"
+<Window x:Class="WinDeskBox.UI.Controls.FenceView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -149,13 +149,45 @@
         </Border.Effect>
 
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="38" /> <!-- 標題與分頁列 -->
-                <RowDefinition Height="*" />  <!-- 檔案內容清單 -->
-            </Grid.RowDefinitions>
+            <!-- 8 向全方位邊界拉伸控制 Thumb (純 WPF 原生實作，100% 穩定，透明無感) -->
+            <Grid x:Name="ResizeGrid" Panel.ZIndex="999">
+                <!-- 4 邊 -->
+                <Thumb x:Name="ResizeTop" Height="7" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,0,10,0" Cursor="SizeNS" DragDelta="Resize_DragDelta" Tag="Top">
+                    <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
+                </Thumb>
+                <Thumb x:Name="ResizeBottom" Height="7" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="10,0,10,0" Cursor="SizeNS" DragDelta="Resize_DragDelta" Tag="Bottom">
+                    <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
+                </Thumb>
+                <Thumb x:Name="ResizeLeft" Width="7" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="0,10,0,10" Cursor="SizeWE" DragDelta="Resize_DragDelta" Tag="Left">
+                    <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
+                </Thumb>
+                <Thumb x:Name="ResizeRight" Width="7" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0,10,0,10" Cursor="SizeWE" DragDelta="Resize_DragDelta" Tag="Right">
+                    <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
+                </Thumb>
 
-            <!-- 標題列（支援拖曳移動與毛玻璃層次） -->
-            <Border Grid.Row="0" Background="#12FFFFFF" CornerRadius="11,11,0,0" BorderThickness="0,0,0,1" BorderBrush="#15FFFFFF" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <!-- 4 圓角 -->
+                <Thumb x:Name="ResizeTopLeft" Width="12" Height="12" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE" DragDelta="Resize_DragDelta" Tag="TopLeft">
+                    <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
+                </Thumb>
+                <Thumb x:Name="ResizeTopRight" Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW" DragDelta="Resize_DragDelta" Tag="TopRight">
+                    <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
+                </Thumb>
+                <Thumb x:Name="ResizeBottomLeft" Width="12" Height="12" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW" DragDelta="Resize_DragDelta" Tag="BottomLeft">
+                    <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
+                </Thumb>
+                <Thumb x:Name="ResizeBottomRight" Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" DragDelta="Resize_DragDelta" Tag="BottomRight">
+                    <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
+                </Thumb>
+            </Grid>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="38" /> <!-- 標題與分頁列 -->
+                    <RowDefinition Height="*" />  <!-- 檔案內容清單 -->
+                </Grid.RowDefinitions>
+
+                <!-- 標題列（支援拖曳移動與毛玻璃層次） -->
+                <Border Grid.Row="0" Background="#12FFFFFF" CornerRadius="11,11,0,0" BorderThickness="0,0,0,1" BorderBrush="#15FFFFFF" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <Grid Margin="10,0,6,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" /> <!-- 收納盒標題 -->
@@ -211,6 +243,7 @@
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
             </ScrollViewer>
+        </Grid>
         </Grid>
     </Border>
 </Window>
