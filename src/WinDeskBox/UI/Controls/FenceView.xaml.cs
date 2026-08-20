@@ -149,19 +149,22 @@ namespace WinDeskBox.UI.Controls
                 {
                     Content = tab.Name,
                     Margin = new Thickness(2, 0, 2, 0),
-                    Padding = new Thickness(8, 3, 8, 3),
+                    Padding = new Thickness(10, 3, 10, 3),
                     Cursor = Cursors.Hand,
-                    Style = (Style)FindResource("FluentIconButton"),
+                    Style = (Style)FindResource("FluentTabButton"),
                     Tag = tabIndex
                 };
 
                 if (i == Config.ActiveTabIndex)
                 {
-                    tabBtn.Background = (Brush)FindResource("SelectedBrush");
-                    tabBtn.Foreground = (Brush)FindResource("TextBrush");
+                    tabBtn.Background = new SolidColorBrush(Color.FromArgb(0x35, 0xFF, 0xFF, 0xFF));
+                    tabBtn.BorderBrush = new SolidColorBrush(Color.FromArgb(0x50, 0xFF, 0xFF, 0xFF));
+                    tabBtn.Foreground = Brushes.White;
                 }
                 else
                 {
+                    tabBtn.Background = Brushes.Transparent;
+                    tabBtn.BorderBrush = Brushes.Transparent;
                     tabBtn.Foreground = (Brush)FindResource("SubTextBrush");
                 }
 
@@ -181,8 +184,10 @@ namespace WinDeskBox.UI.Controls
             {
                 if (TabsPanel.Children[i] is Button btn)
                 {
-                    btn.Background = (i == index) ? (Brush)FindResource("SelectedBrush") : Brushes.Transparent;
-                    btn.Foreground = (i == index) ? (Brush)FindResource("TextBrush") : (Brush)FindResource("SubTextBrush");
+                    bool isActive = (i == index);
+                    btn.Background = isActive ? new SolidColorBrush(Color.FromArgb(0x35, 0xFF, 0xFF, 0xFF)) : Brushes.Transparent;
+                    btn.BorderBrush = isActive ? new SolidColorBrush(Color.FromArgb(0x50, 0xFF, 0xFF, 0xFF)) : Brushes.Transparent;
+                    btn.Foreground = isActive ? Brushes.White : (Brush)FindResource("SubTextBrush");
                 }
             }
 
@@ -572,8 +577,10 @@ namespace WinDeskBox.UI.Controls
         public void UpdateLockState(bool locked)
         {
             Config.IsLocked = locked;
-            TxtLockIcon.Text = locked ? "🔒" : "🔓";
-            ResizeMode = locked ? ResizeMode.NoResize : ResizeMode.CanResizeWithGrip;
+            PathLockIcon.Data = Geometry.Parse(locked
+                ? "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
+                : "M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10A2,2 0 0,1 6,8H15V6A3,3 0 0,0 12,3A3,3 0 0,0 9,6H7A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17Z");
+            PathLockIcon.Opacity = locked ? 1.0 : 0.7;
         }
 
         private void BtnRollup_Click(object sender, RoutedEventArgs e)
@@ -589,13 +596,13 @@ namespace WinDeskBox.UI.Controls
                 _expandedHeight = Height;
                 Height = 38;
                 ContentScrollViewer.Visibility = Visibility.Collapsed;
-                TxtRollupIcon.Text = "▼";
+                PathRollupIcon.Data = Geometry.Parse("M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z");
             }
             else
             {
                 Height = _expandedHeight;
                 ContentScrollViewer.Visibility = Visibility.Visible;
-                TxtRollupIcon.Text = "▲";
+                PathRollupIcon.Data = Geometry.Parse("M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z");
             }
         }
 
