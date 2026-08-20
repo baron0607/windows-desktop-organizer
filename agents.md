@@ -3,7 +3,7 @@
 > 本檔為跨 Agent 通用的專案藍圖（AGENTS.md 開放標準）。任何 Agent 的每個 session 都應先讀本檔＋`handoff.md`。
 
 ## 專案簡介
-為 Windows 11 打造的輕量、高效、免安裝（Portable Self-Contained）桌面管理與分區收納工具（**WinDeskBox 桌面收納箱**）。支援 Fluent Acrylic 毛玻璃質感、自訂資料夾映射收納盒（Folder Portal，支援展示子資料夾與檔案並快速啟動）、分頁收納 (Tabs)、開機自動啟動、手動一鍵整理與 100% 離線資安防護。
+為 Windows 11 打造的輕量、高效、免安裝（Portable Self-Contained）桌面管理與分區收納工具（**WinDeskBox 桌面收納箱**）。支援 Fluent Acrylic 毛玻璃質感、自訂資料夾映射收納盒（Folder Portal，支援展示子資料夾與檔案並快速啟動）、分頁收納 (Tabs)、開機自動啟動、手動一鍵整理、8 向邊界自由縮放、JUMBO 超高畫質圖示與 100% 離線資安防護。
 
 ## 關鍵時程
 <!-- 格式：- 事件名稱：日期（說明）；沒有就留白 -->
@@ -14,6 +14,7 @@
 - [x] 階段二：Win32 底層核心與收納盒 UI 開發（WorkerW/置底雙模桌面綁定、多螢幕防護、Acrylic 毛玻璃、非同步圖示快取、Roll-up 收合）
 - [x] 階段三：自訂資料夾映射與檔案快速啟動（子目錄與檔案清單、Tabs 分頁、雙擊開啟、拖曳存入與同名防呆）
 - [x] 階段四：開機自啟管理、設定介面、一鍵手動整理與 Portable 單檔打包（`build/WinDeskBox-Portable/WinDeskBox.exe`）
+- [x] 階段五：UI/UX 深度打磨（Windows Shell JUMBO 256x256 超高畫質圖示、Fluent 旗艦毛玻璃微光漸層視覺、WPF 原生 8 向邊框拉伸縮放控制器）
 
 ## 資料夾結構
 ```
