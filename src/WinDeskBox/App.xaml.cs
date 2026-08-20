@@ -14,6 +14,7 @@ namespace WinDeskBox
     {
         private static Mutex? _mutex;
         private AppConfig _config = new();
+        public AppConfig Config => _config;
         private readonly List<FenceView> _fenceViews = new();
         private TrayIconManager? _trayManager;
         private bool _isDesktopHidden = false;

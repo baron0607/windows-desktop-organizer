@@ -55,6 +55,7 @@ namespace WinDeskBox.UI.Controls
 
             TxtBoxTitle.Text = Config.Title;
             UpdateLockState(Config.IsLocked);
+            UpdatePrivacyLockState(Config.IsPrivacyLocked);
 
             // 5. 初始化 Tabs 分頁與資料夾內容載入
             RenderTabs();
@@ -169,7 +170,9 @@ namespace WinDeskBox.UI.Controls
         private void RenderTabs()
         {
             TabsPanel.Children.Clear();
-            if (Config.Tabs.Count <= 1) return; // 只有一個分頁時隱藏分頁列
+            bool hasMultipleTabs = Config.Tabs.Count > 1;
+            TabsBorder.Visibility = hasMultipleTabs ? Visibility.Visible : Visibility.Collapsed;
+            if (!hasMultipleTabs) return;
 
             for (int i = 0; i < Config.Tabs.Count; i++)
             {
@@ -581,7 +584,17 @@ namespace WinDeskBox.UI.Controls
             if (!_isCollapsed) Config.Height = Height;
         }
 
-        private void BtnSettings_Click(object sender, RoutedEventArgs e)
+        private void BtnHamburgerMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (BtnHamburgerMenu.ContextMenu != null)
+            {
+                BtnHamburgerMenu.ContextMenu.PlacementTarget = BtnHamburgerMenu;
+                BtnHamburgerMenu.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+                BtnHamburgerMenu.ContextMenu.IsOpen = true;
+            }
+        }
+
+        private void MenuSettings_Click(object sender, RoutedEventArgs e)
         {
             if (Application.Current is App app)
             {
@@ -589,32 +602,94 @@ namespace WinDeskBox.UI.Controls
             }
         }
 
-        private void BtnToggleView_Click(object sender, RoutedEventArgs e)
+        private void MenuOpenFolderInExplorer_Click(object sender, RoutedEventArgs e)
+        {
+            if (Config.ActiveTabIndex >= 0 && Config.ActiveTabIndex < Config.Tabs.Count)
+            {
+                var tab = Config.Tabs[Config.ActiveTabIndex];
+                if (!string.IsNullOrWhiteSpace(tab.FolderPath) && Directory.Exists(tab.FolderPath))
+                {
+                    Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = $"\"{tab.FolderPath}\"", UseShellExecute = true });
+                }
+            }
+        }
+
+        private void MenuToggleViewMode_Click(object sender, RoutedEventArgs e)
         {
             if (Config.ActiveTabIndex >= 0 && Config.ActiveTabIndex < Config.Tabs.Count)
             {
                 var tab = Config.Tabs[Config.ActiveTabIndex];
                 tab.ViewMode = (tab.ViewMode == "Grid") ? "List" : "Grid";
                 ApplyViewMode(tab.ViewMode);
+                ConfigManager.Save(((App)Application.Current).Config);
             }
         }
 
-        private void BtnLockPosition_Click(object sender, RoutedEventArgs e)
+        private void MenuToggleLockPosition_Click(object sender, RoutedEventArgs e)
         {
             UpdateLockState(!Config.IsLocked);
+        }
+
+        private void MenuTogglePrivacy_Click(object sender, RoutedEventArgs e)
+        {
+            UpdatePrivacyLockState(!Config.IsPrivacyLocked);
+        }
+
+        private void MenuRenameBox_Click(object sender, RoutedEventArgs e)
+        {
+            if (Application.Current is App app)
+            {
+                app.OpenSettingsForBox(Config.Id);
+            }
+        }
+
+        private void MenuOrganizeDesktop_Click(object sender, RoutedEventArgs e)
+        {
+            if (Application.Current is App app)
+            {
+                int count = SafetyManager.OrganizeDesktop(app.Config.General.OrganizeDirectoryName);
+                MessageBox.Show($"整理完成！已成功分類歸檔 {count} 個桌面檔案至「{app.Config.General.OrganizeDirectoryName}」目錄中。", "桌面整理完成", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void LockOverlay_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount >= 2)
+            {
+                UpdatePrivacyLockState(false);
+            }
+        }
+
+        public void UpdatePrivacyLockState(bool locked)
+        {
+            Config.IsPrivacyLocked = locked;
+            if (LockOverlayGrid != null)
+            {
+                LockOverlayGrid.Visibility = locked ? Visibility.Visible : Visibility.Collapsed;
+            }
+            if (ContentScrollViewer != null)
+            {
+                ContentScrollViewer.Effect = locked ? new System.Windows.Media.Effects.BlurEffect { Radius = 16 } : null;
+            }
+            if (PathLockStatus != null)
+            {
+                PathLockStatus.Visibility = (Config.IsLocked || Config.IsPrivacyLocked) ? Visibility.Visible : Visibility.Collapsed;
+            }
+            ConfigManager.Save(((App)Application.Current).Config);
         }
 
         public void UpdateLockState(bool locked)
         {
             Config.IsLocked = locked;
-            PathLockIcon.Data = Geometry.Parse(locked
-                ? "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
-                : "M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10A2,2 0 0,1 6,8H15V6A3,3 0 0,0 12,3A3,3 0 0,0 9,6H7A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17Z");
-            PathLockIcon.Opacity = locked ? 1.0 : 0.7;
+            if (PathLockStatus != null)
+            {
+                PathLockStatus.Visibility = (Config.IsLocked || Config.IsPrivacyLocked) ? Visibility.Visible : Visibility.Collapsed;
+            }
             if (ResizeGrid != null)
             {
                 ResizeGrid.Visibility = locked ? Visibility.Collapsed : Visibility.Visible;
             }
+            ConfigManager.Save(((App)Application.Current).Config);
         }
 
         private void BtnRollup_Click(object sender, RoutedEventArgs e)
@@ -628,15 +703,19 @@ namespace WinDeskBox.UI.Controls
             if (collapse)
             {
                 _expandedHeight = Height;
-                Height = 38;
+                Height = 36;
                 ContentScrollViewer.Visibility = Visibility.Collapsed;
-                PathRollupIcon.Data = Geometry.Parse("M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z");
+                if (LockOverlayGrid != null) LockOverlayGrid.Visibility = Visibility.Collapsed;
+                if (TabsBorder != null) TabsBorder.Visibility = Visibility.Collapsed;
+                PathRollupIcon.Data = Geometry.Parse("M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z");
             }
             else
             {
                 Height = _expandedHeight;
                 ContentScrollViewer.Visibility = Visibility.Visible;
-                PathRollupIcon.Data = Geometry.Parse("M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z");
+                if (LockOverlayGrid != null && Config.IsPrivacyLocked) LockOverlayGrid.Visibility = Visibility.Visible;
+                if (TabsBorder != null && Config.Tabs.Count > 1) TabsBorder.Visibility = Visibility.Visible;
+                PathRollupIcon.Data = Geometry.Parse("M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z");
             }
         }
 

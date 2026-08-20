@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json.Serialization;
@@ -90,6 +90,11 @@ namespace WinDeskBox.Config
         /// 是否鎖定收納盒位置（鎖定時禁止拖動與縮放視窗）
         /// </summary>
         public bool IsLocked { get; set; } = false;
+
+        /// <summary>
+        /// 是否啟用隱私防護鎖定（鎖定時模糊內容並顯示綠色盾牌解鎖畫面）
+        /// </summary>
+        public bool IsPrivacyLocked { get; set; } = false;
 
         /// <summary>
         /// 是否啟用滑鼠移出自動收合 (Roll-up)
