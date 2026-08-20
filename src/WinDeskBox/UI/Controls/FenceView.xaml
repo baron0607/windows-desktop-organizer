@@ -13,7 +13,7 @@
         ShowInTaskbar="False"
         ResizeMode="NoResize"
         AllowDrop="True"
-        MinWidth="200" MinHeight="120"
+        MinWidth="180" MinHeight="100"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
         SizeChanged="Window_SizeChanged"
@@ -26,7 +26,7 @@
     <Window.Resources>
         <!-- 大圖示網格項目模板 (Grid Mode) -->
         <DataTemplate x:Key="GridItemTemplate" DataType="{x:Type local:FileItemViewModel}">
-            <Border x:Name="ItemBorder" Width="82" Height="88" Margin="3" CornerRadius="3" Background="Transparent"
+            <Border x:Name="ItemBorder" Width="82" Height="86" Margin="3" CornerRadius="3" Background="Transparent"
                     BorderThickness="1" BorderBrush="Transparent"
                     ToolTip="{Binding FullPath}" Cursor="Hand" MouseLeftButtonDown="Item_MouseLeftButtonDown"
                     SnapsToDevicePixels="True">
@@ -77,7 +77,7 @@
 
         <!-- 詳細清單項目模板 (List Mode) -->
         <DataTemplate x:Key="ListItemTemplate" DataType="{x:Type local:FileItemViewModel}">
-            <Border x:Name="ItemBorder" Height="32" Margin="2,1" CornerRadius="3" Background="Transparent"
+            <Border x:Name="ItemBorder" Height="30" Margin="2,1" CornerRadius="3" Background="Transparent"
                     BorderThickness="1" BorderBrush="Transparent"
                     ToolTip="{Binding FullPath}" Cursor="Hand" MouseLeftButtonDown="Item_MouseLeftButtonDown"
                     SnapsToDevicePixels="True">
@@ -93,18 +93,18 @@
                 </Border.ContextMenu>
                 <Grid Margin="6,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="26" />
+                        <ColumnDefinition Width="24" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Image Grid.Column="0" Source="{Binding Icon}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    <Image Grid.Column="0" Source="{Binding Icon}" Width="18" Height="18" HorizontalAlignment="Center" VerticalAlignment="Center"
                            RenderOptions.BitmapScalingMode="HighQuality"
                            SnapsToDevicePixels="True" />
 
                     <!-- 正常顯示文字 -->
                     <TextBlock Grid.Column="1" Text="{Binding DisplayName}" Visibility="{Binding IsRenaming, Converter={x:Static local:FenceView.InverseBoolToVis}}"
-                               Foreground="#FFFFFF" FontSize="12" FontFamily="Segoe UI Variable Text, Segoe UI, Microsoft JhengHei"
+                               Foreground="#FFFFFF" FontSize="11.5" FontFamily="Segoe UI Variable Text, Segoe UI, Microsoft JhengHei"
                                VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="6,0,0,0">
                         <TextBlock.Effect>
                             <DropShadowEffect BlurRadius="3" ShadowDepth="1" Direction="270" Opacity="0.7" Color="#000000" />
@@ -113,7 +113,7 @@
 
                     <!-- 重新命名輸入框 -->
                     <TextBox Grid.Column="1" Text="{Binding EditingName, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsRenaming, Converter={x:Static local:FenceView.BoolToVis}}"
-                             FontSize="12" VerticalAlignment="Center" Margin="6,0,0,0" Background="#1E1E1E" Foreground="White" BorderBrush="#0078D4" KeyDown="RenameTextBox_KeyDown" LostFocus="RenameTextBox_LostFocus" />
+                             FontSize="11.5" VerticalAlignment="Center" Margin="6,0,0,0" Background="#1E1E1E" Foreground="White" BorderBrush="#0078D4" KeyDown="RenameTextBox_KeyDown" LostFocus="RenameTextBox_LostFocus" />
 
                     <TextBlock Grid.Column="2" Text="{Binding LastModified}" Foreground="#A0FFFFFF" FontSize="10" VerticalAlignment="Center" Margin="8,0,4,0" />
                 </Grid>
@@ -127,8 +127,8 @@
         </DataTemplate>
     </Window.Resources>
 
-    <!-- 外層收納盒純粹中性深灰半透明容器 (消除藍色桌布透光干擾) -->
-    <Border x:Name="MainBorder" CornerRadius="3" BorderThickness="1" BorderBrush="#555555" Background="#2E2E2EF2" SnapsToDevicePixels="True">
+    <!-- 外層收納盒純粹中性透明灰色容器 (完全不受桌布藍色干擾) -->
+    <Border x:Name="MainBorder" CornerRadius="3" BorderThickness="1" BorderBrush="#505050" Background="#BA363636" SnapsToDevicePixels="True">
         <Border.Effect>
             <DropShadowEffect BlurRadius="16" ShadowDepth="3" Direction="270" Opacity="0.5" Color="#000000" />
         </Border.Effect>
@@ -137,44 +137,44 @@
             <!-- 8 向全方位邊界拉伸控制 Thumb (純 WPF 原生實作，100% 穩定，透明無感) -->
             <Grid x:Name="ResizeGrid" Panel.ZIndex="999">
                 <!-- 4 邊 -->
-                <Thumb x:Name="ResizeTop" Height="6" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="8,0,8,0" Cursor="SizeNS" DragDelta="Resize_DragDelta" Tag="Top">
+                <Thumb x:Name="ResizeTop" Height="5" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="6,0,6,0" Cursor="SizeNS" DragDelta="Resize_DragDelta" Tag="Top">
                     <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
                 </Thumb>
-                <Thumb x:Name="ResizeBottom" Height="6" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="8,0,8,0" Cursor="SizeNS" DragDelta="Resize_DragDelta" Tag="Bottom">
+                <Thumb x:Name="ResizeBottom" Height="5" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="6,0,6,0" Cursor="SizeNS" DragDelta="Resize_DragDelta" Tag="Bottom">
                     <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
                 </Thumb>
-                <Thumb x:Name="ResizeLeft" Width="6" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="0,8,0,8" Cursor="SizeWE" DragDelta="Resize_DragDelta" Tag="Left">
+                <Thumb x:Name="ResizeLeft" Width="5" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="0,6,0,6" Cursor="SizeWE" DragDelta="Resize_DragDelta" Tag="Left">
                     <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
                 </Thumb>
-                <Thumb x:Name="ResizeRight" Width="6" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0,8,0,8" Cursor="SizeWE" DragDelta="Resize_DragDelta" Tag="Right">
+                <Thumb x:Name="ResizeRight" Width="5" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0,6,0,6" Cursor="SizeWE" DragDelta="Resize_DragDelta" Tag="Right">
                     <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
                 </Thumb>
 
                 <!-- 4 圓角 -->
-                <Thumb x:Name="ResizeTopLeft" Width="10" Height="10" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE" DragDelta="Resize_DragDelta" Tag="TopLeft">
+                <Thumb x:Name="ResizeTopLeft" Width="8" Height="8" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE" DragDelta="Resize_DragDelta" Tag="TopLeft">
                     <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
                 </Thumb>
-                <Thumb x:Name="ResizeTopRight" Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW" DragDelta="Resize_DragDelta" Tag="TopRight">
+                <Thumb x:Name="ResizeTopRight" Width="8" Height="8" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW" DragDelta="Resize_DragDelta" Tag="TopRight">
                     <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
                 </Thumb>
-                <Thumb x:Name="ResizeBottomLeft" Width="10" Height="10" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW" DragDelta="Resize_DragDelta" Tag="BottomLeft">
+                <Thumb x:Name="ResizeBottomLeft" Width="8" Height="8" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW" DragDelta="Resize_DragDelta" Tag="BottomLeft">
                     <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
                 </Thumb>
-                <Thumb x:Name="ResizeBottomRight" Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" DragDelta="Resize_DragDelta" Tag="BottomRight">
+                <Thumb x:Name="ResizeBottomRight" Width="8" Height="8" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" DragDelta="Resize_DragDelta" Tag="BottomRight">
                     <Thumb.Template><ControlTemplate><Rectangle Fill="Transparent" /></ControlTemplate></Thumb.Template>
                 </Thumb>
             </Grid>
 
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="36" /> <!-- 標題列 -->
+                    <RowDefinition Height="26" /> <!-- 精巧縮小高度的標題列 (26px) -->
                     <RowDefinition Height="Auto" /> <!-- 分頁列 (Tabs, 多於1個時顯示) -->
                     <RowDefinition Height="*" />  <!-- 檔案內容清單與解鎖防護罩 -->
                 </Grid.RowDefinitions>
 
-                <!-- 標題列：實心經典純灰色 (#484848) + 左漢堡選單 + 置中標題 + 右收合按鈕 -->
-                <Border Grid.Row="0" Background="#484848" CornerRadius="2,2,0,0" BorderThickness="0,0,0,1" BorderBrush="#383838" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
-                    <Grid Margin="6,0,6,0">
+                <!-- 標題列：精巧簡約實心深灰 (#464646, 26px 高度) -->
+                <Border Grid.Row="0" Background="#464646" CornerRadius="2,2,0,0" BorderThickness="0,0,0,1" BorderBrush="#353535" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    <Grid Margin="4,0,4,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" /> <!-- 左側選單 -->
                             <ColumnDefinition Width="*" />    <!-- 置中標題 -->
@@ -182,9 +182,9 @@
                         </Grid.ColumnDefinitions>
 
                         <!-- 左側漢堡選單按鈕 (☰) -->
-                        <Button x:Name="BtnHamburgerMenu" Grid.Column="0" Style="{DynamicResource FluentIconButton}" ToolTip="收納盒選項選單" Click="BtnHamburgerMenu_Click" Width="26" Height="26">
+                        <Button x:Name="BtnHamburgerMenu" Grid.Column="0" Style="{DynamicResource FluentIconButton}" ToolTip="收納盒選項選單" Click="BtnHamburgerMenu_Click" Width="22" Height="22" Padding="2">
                             <Path Data="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"
-                                  Fill="#FFFFFF" Stretch="Uniform" Width="13" Height="13" />
+                                  Fill="#FFFFFF" Stretch="Uniform" Width="12" Height="12" />
                             <Button.ContextMenu>
                                 <ContextMenu x:Name="BoxContextMenu">
                                     <MenuItem Header="⚙️ 收納盒與資料夾映射設定..." Click="MenuSettings_Click" />
@@ -202,23 +202,23 @@
 
                         <!-- 置中標題與鎖頭狀態 -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Path x:Name="PathLockStatus" Margin="0,0,6,0" VerticalAlignment="Center"
+                            <Path x:Name="PathLockStatus" Margin="0,0,5,0" VerticalAlignment="Center"
                                   Data="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
-                                  Fill="#FFFFFF" Stretch="Uniform" Width="11" Height="11" />
-                            <TextBlock x:Name="TxtBoxTitle" Text="私人方盒" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="13.5"
+                                  Fill="#FFFFFF" Stretch="Uniform" Width="10" Height="10" />
+                            <TextBlock x:Name="TxtBoxTitle" Text="私人方盒" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12"
                                        FontFamily="Segoe UI Variable Display, Segoe UI, Microsoft JhengHei" VerticalAlignment="Center" />
                         </StackPanel>
 
                         <!-- 右側折疊/展開按鈕 (⌄) -->
-                        <Button x:Name="BtnRollup" Grid.Column="2" Style="{DynamicResource FluentIconButton}" ToolTip="收合/展開收納盒" Click="BtnRollup_Click" Width="26" Height="26">
+                        <Button x:Name="BtnRollup" Grid.Column="2" Style="{DynamicResource FluentIconButton}" ToolTip="收合/展開收納盒" Click="BtnRollup_Click" Width="22" Height="22" Padding="2">
                             <Path x:Name="PathRollupIcon" Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
-                                  Fill="#FFFFFF" Stretch="Uniform" Width="11" Height="11" />
+                                  Fill="#FFFFFF" Stretch="Uniform" Width="10" Height="10" />
                         </Button>
                     </Grid>
                 </Border>
 
                 <!-- 分頁列 (Tabs, 多於1個時顯示) -->
-                <Border Grid.Row="1" x:Name="TabsBorder" Background="#353535" BorderThickness="0,0,0,1" BorderBrush="#404040" Visibility="Collapsed">
+                <Border Grid.Row="1" x:Name="TabsBorder" Background="#333333" BorderThickness="0,0,0,1" BorderBrush="#404040" Visibility="Collapsed">
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Padding="4,2">
                         <StackPanel x:Name="TabsPanel" Orientation="Horizontal" />
                     </ScrollViewer>
@@ -227,7 +227,7 @@
                 <!-- 內容區域（支援隱私解鎖盾牌層） -->
                 <Grid Grid.Row="2">
                     <!-- 檔案內容清單區域 -->
-                    <ScrollViewer x:Name="ContentScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="6">
+                    <ScrollViewer x:Name="ContentScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="5">
                         <ItemsControl x:Name="FilesItemsControl">
                             <!-- 網格模式排版容器 -->
                             <ItemsControl.ItemsPanel>
@@ -239,18 +239,18 @@
                     </ScrollViewer>
 
                     <!-- 隱私防護鎖定層（綠色盾牌 + 按兩下以解鎖這個方盒） -->
-                    <Grid x:Name="LockOverlayGrid" Background="#50202020" Visibility="Collapsed"
+                    <Grid x:Name="LockOverlayGrid" Background="#60202020" Visibility="Collapsed"
                           Cursor="Hand" MouseLeftButtonDown="LockOverlay_MouseLeftButtonDown">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                             <!-- 圓形盾牌徽章 -->
-                            <Border Width="56" Height="56" CornerRadius="28" Background="#3A3A3A" BorderBrush="#505050" BorderThickness="1" HorizontalAlignment="Center">
+                            <Border Width="50" Height="50" CornerRadius="25" Background="#383838" BorderBrush="#505050" BorderThickness="1" HorizontalAlignment="Center">
                                 <Path Data="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1Z"
-                                      Fill="#22C55E" Stretch="Uniform" Width="26" Height="26" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                      Fill="#22C55E" Stretch="Uniform" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
 
                             <!-- 解鎖提示文字 -->
-                            <TextBlock Text="按兩下以解鎖這個方盒!" Foreground="#FFFFFF" FontSize="13" FontWeight="Normal"
-                                       FontFamily="Segoe UI Variable Text, Microsoft JhengHei" TextAlignment="Center" Margin="0,12,0,0">
+                            <TextBlock Text="按兩下以解鎖這個方盒!" Foreground="#FFFFFF" FontSize="12.5" FontWeight="Normal"
+                                       FontFamily="Segoe UI Variable Text, Microsoft JhengHei" TextAlignment="Center" Margin="0,10,0,0">
                                 <TextBlock.Effect>
                                     <DropShadowEffect BlurRadius="4" ShadowDepth="1" Direction="270" Opacity="0.8" Color="#000000" />
                                 </TextBlock.Effect>

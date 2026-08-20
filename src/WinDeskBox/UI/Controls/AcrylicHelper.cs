@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -43,8 +43,8 @@ namespace WinDeskBox.UI.Controls
                     int darkMode = isDarkMode ? 1 : 0;
                     DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref darkMode, sizeof(int));
 
-                    // 3. 套用 Acrylic 背景材質
-                    int backdropType = DWMSBT_TRANSIENTWINDOW;
+                    // 3. 不套用 DWM 系統著色材質，避免桌布色調滲透，由 WPF 硬體 Alpha 渲染純粹透明中性灰
+                    int backdropType = DWMSBT_NONE;
                     DwmSetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref backdropType, sizeof(int));
                 }
                 catch (Exception ex)

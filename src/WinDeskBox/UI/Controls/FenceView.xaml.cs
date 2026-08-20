@@ -703,7 +703,7 @@ namespace WinDeskBox.UI.Controls
             if (collapse)
             {
                 _expandedHeight = Height;
-                Height = 36;
+                Height = 26;
                 ContentScrollViewer.Visibility = Visibility.Collapsed;
                 if (LockOverlayGrid != null) LockOverlayGrid.Visibility = Visibility.Collapsed;
                 if (TabsBorder != null) TabsBorder.Visibility = Visibility.Collapsed;
