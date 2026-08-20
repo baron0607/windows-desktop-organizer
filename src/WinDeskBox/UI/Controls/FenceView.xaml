@@ -24,7 +24,7 @@
     <Window.Resources>
         <!-- 大圖示網格項目模板 (Grid Mode) -->
         <DataTemplate x:Key="GridItemTemplate" DataType="{x:Type local:FileItemViewModel}">
-            <Border x:Name="ItemBorder" Width="82" Height="86" Margin="4" CornerRadius="6" Background="Transparent"
+            <Border x:Name="ItemBorder" Width="86" Height="92" Margin="3" CornerRadius="6" Background="Transparent"
                     ToolTip="{Binding FullPath}" Cursor="Hand" MouseLeftButtonDown="Item_MouseLeftButtonDown">
                 <Border.ContextMenu>
                     <ContextMenu>
@@ -38,15 +38,17 @@
                 </Border.ContextMenu>
                 <Grid VerticalAlignment="Center">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="46" />
+                        <RowDefinition Height="48" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <Image Grid.Row="0" Source="{Binding Icon}" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" />
+                    <Image Grid.Row="0" Source="{Binding Icon}" Width="44" Height="44" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           SnapsToDevicePixels="True" />
 
                     <!-- 正常顯示文字 -->
-                    <TextBlock Grid.Row="1" Text="{Binding Name}" Visibility="{Binding IsRenaming, Converter={x:Static local:FenceView.InverseBoolToVis}}"
-                               Foreground="#FFFFFF" FontSize="11" TextAlignment="Center" TextWrapping="Wrap" MaxHeight="30" TextTrimming="CharacterEllipsis" Margin="2,2,2,0" />
+                    <TextBlock Grid.Row="1" Text="{Binding DisplayName}" Visibility="{Binding IsRenaming, Converter={x:Static local:FenceView.InverseBoolToVis}}"
+                               Foreground="#FFFFFF" FontSize="11" TextAlignment="Center" TextWrapping="Wrap" MaxHeight="32" TextTrimming="CharacterEllipsis" Margin="2,2,2,0" />
 
                     <!-- 重新命名輸入框 -->
                     <TextBox Grid.Row="1" Text="{Binding EditingName, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsRenaming, Converter={x:Static local:FenceView.BoolToVis}}"
@@ -76,15 +78,17 @@
                 </Border.ContextMenu>
                 <Grid Margin="4,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="26" />
+                        <ColumnDefinition Width="28" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Image Grid.Column="0" Source="{Binding Icon}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" />
+                    <Image Grid.Column="0" Source="{Binding Icon}" Width="22" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           SnapsToDevicePixels="True" />
 
                     <!-- 正常顯示文字 -->
-                    <TextBlock Grid.Column="1" Text="{Binding Name}" Visibility="{Binding IsRenaming, Converter={x:Static local:FenceView.InverseBoolToVis}}"
+                    <TextBlock Grid.Column="1" Text="{Binding DisplayName}" Visibility="{Binding IsRenaming, Converter={x:Static local:FenceView.InverseBoolToVis}}"
                                Foreground="#FFFFFF" FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="6,0,0,0" />
 
                     <!-- 重新命名輸入框 -->

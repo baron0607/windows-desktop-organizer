@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 
@@ -18,8 +19,13 @@ namespace WinDeskBox.UI.Controls
         public string Name
         {
             get => _name;
-            set { _name = value; OnPropertyChanged(); }
+            set { _name = value; OnPropertyChanged(); OnPropertyChanged(nameof(DisplayName)); }
         }
+
+        public string DisplayName =>
+            (!IsDirectory && Name.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
+                ? Path.GetFileNameWithoutExtension(Name)
+                : Name;
 
         public string FullPath { get; set; } = string.Empty;
 
