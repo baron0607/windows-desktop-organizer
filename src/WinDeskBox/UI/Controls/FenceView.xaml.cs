@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using WinDeskBox.Config;
 using WinDeskBox.Core;
@@ -43,7 +44,12 @@ namespace WinDeskBox.UI.Controls
             // 2. 釘在桌面底層圖層 (WorkerW / HWND_BOTTOM)
             DesktopWorker.PinToDesktopBottom(this);
 
-            // 3. 恢復幾何尺寸與座標
+            // 3. 掛載 Win32 訊息攔截以支援上下左右邊框 8 向自由拉伸
+            var helper = new WindowInteropHelper(this);
+            var source = HwndSource.FromHwnd(helper.Handle);
+            source?.AddHook(WndProc);
+
+            // 4. 恢復幾何尺寸與座標
             ScreenBoundsGuard.ClampToScreen(Config);
             Left = Config.Left;
             Top = Config.Top;
@@ -54,10 +60,75 @@ namespace WinDeskBox.UI.Controls
             TxtBoxTitle.Text = Config.Title;
             UpdateLockState(Config.IsLocked);
 
-            // 4. 初始化 Tabs 分頁與資料夾內容載入
+            // 5. 初始化 Tabs 分頁與資料夾內容載入
             RenderTabs();
             SwitchToTab(Config.ActiveTabIndex);
         }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (!_isCollapsed && IsLoaded)
+            {
+                Config.Width = Width;
+                Config.Height = Height;
+                _expandedHeight = Height;
+            }
+        }
+
+        private void Window_LocationChanged(object sender, EventArgs e)
+        {
+            if (IsLoaded)
+            {
+                Config.Left = Left;
+                Config.Top = Top;
+            }
+        }
+
+        #region Win32 8 向邊界感應拉伸調整尺寸
+        private const int WM_NCHITTEST = 0x0084;
+        private const int HTLEFT = 10;
+        private const int HTRIGHT = 11;
+        private const int HTTOP = 12;
+        private const int HTTOPLEFT = 13;
+        private const int HTTOPRIGHT = 14;
+        private const int HTBOTTOM = 15;
+        private const int HTBOTTOMLEFT = 16;
+        private const int HTBOTTOMRIGHT = 17;
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == WM_NCHITTEST)
+            {
+                if (Config.IsLocked || _isCollapsed)
+                {
+                    return IntPtr.Zero;
+                }
+
+                int x = (short)(lParam.ToInt32() & 0xFFFF);
+                int y = (short)((lParam.ToInt32() >> 16) & 0xFFFF);
+
+                Point pt = PointFromScreen(new Point(x, y));
+                double w = ActualWidth;
+                double h = ActualHeight;
+                double b = 7; // 邊框感應厚度 7px
+
+                bool left = pt.X <= b;
+                bool right = pt.X >= w - b;
+                bool top = pt.Y <= b;
+                bool bottom = pt.Y >= h - b;
+
+                if (top && left) { handled = true; return (IntPtr)HTTOPLEFT; }
+                if (top && right) { handled = true; return (IntPtr)HTTOPRIGHT; }
+                if (bottom && left) { handled = true; return (IntPtr)HTBOTTOMLEFT; }
+                if (bottom && right) { handled = true; return (IntPtr)HTBOTTOMRIGHT; }
+                if (left) { handled = true; return (IntPtr)HTLEFT; }
+                if (right) { handled = true; return (IntPtr)HTRIGHT; }
+                if (top) { handled = true; return (IntPtr)HTTOP; }
+                if (bottom) { handled = true; return (IntPtr)HTBOTTOM; }
+            }
+            return IntPtr.Zero;
+        }
+        #endregion
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
