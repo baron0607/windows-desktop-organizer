@@ -16,9 +16,12 @@
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Copyright>Copyright © 2026</Copyright>
 
-    <!-- 方案 A 發布設定：Framework-Dependent 模式，直接調用微軟官方簽署之 .NET 8 Runtime，徹底杜絕 ZwWriteVirtualMemory 誤判 -->
-    <PublishSingleFile>false</PublishSingleFile>
-    <SelfContained>false</SelfContained>
+    <!-- 免安裝單一執行檔 (Portable Self-Contained Single File) 設定 -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
