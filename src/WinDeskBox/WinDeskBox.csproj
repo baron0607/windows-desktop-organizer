@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -16,12 +16,9 @@
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Copyright>Copyright © 2026</Copyright>
 
-    <!-- 發布單一檔案免安裝綠色設定 -->
-    <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <!-- 方案 A 發布設定：Framework-Dependent 模式，直接調用微軟官方簽署之 .NET 8 Runtime，徹底杜絕 ZwWriteVirtualMemory 誤判 -->
+    <PublishSingleFile>false</PublishSingleFile>
+    <SelfContained>false</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>
