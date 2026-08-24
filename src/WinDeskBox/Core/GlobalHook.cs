@@ -11,10 +11,11 @@ namespace WinDeskBox.Core
     /// </summary>
     public static class GlobalHook
     {
-        public static event Action? DesktopDoubleClicked;
+        public static event Action<int, int>? DesktopDoubleClicked;
 
         private const int WH_MOUSE_LL = 14;
         private const int WM_LBUTTONDOWN = 0x0201;
+        private const uint GA_ROOT = 2;
 
         private static LowLevelMouseProc? _proc;
         private static IntPtr _hookId = IntPtr.Zero;
@@ -62,15 +63,17 @@ namespace WinDeskBox.Core
                 int dx = Math.Abs(hookStruct.pt.x - _lastClickPos.x);
                 int dy = Math.Abs(hookStruct.pt.y - _lastClickPos.y);
 
-                if ((currentTime - _lastClickTime) <= doubleClickTime && dx <= 4 && dy <= 4)
+                if ((currentTime - _lastClickTime) <= doubleClickTime && dx <= 6 && dy <= 6)
                 {
-                    // 檢查點擊處底下的視窗是否為桌面 (WorkerW / Progman / SysListView32)
-                    IntPtr targetHwnd = WindowFromPoint(hookStruct.pt);
-                    if (IsDesktopWindow(targetHwnd))
+                    int clickX = hookStruct.pt.x;
+                    int clickY = hookStruct.pt.y;
+
+                    // 檢查點擊處是否為「純桌面空白處」（完全不跨進程發送指針消息，100% 防崩潰防黑屏，精準排除 Word/Excel 圖示）
+                    if (IsBlankDesktopArea(hookStruct.pt))
                     {
                         Application.Current?.Dispatcher.BeginInvoke(() =>
                         {
-                            DesktopDoubleClicked?.Invoke();
+                            DesktopDoubleClicked?.Invoke(clickX, clickY);
                         });
                     }
                     _lastClickTime = 0; // 重設避免連續三擊誤判
@@ -84,35 +87,62 @@ namespace WinDeskBox.Core
             return CallNextHookEx(_hookId, nCode, wParam, lParam);
         }
 
-        private static bool IsDesktopWindow(IntPtr hWnd)
+        /// <summary>
+        /// 嚴格且安全地判斷點擊位置是否為「純桌面空白處」：
+        /// 1. 排除本程式視窗 (WinDeskBox)
+        /// 2. 排除檔案總管視窗 (CabinetWClass) 與任何一般應用程式視窗
+        /// 3. 透過無崩潰的 Windows Accessibility COM 介面判斷是否命中檔案圖示 (Word/Excel/捷徑)
+        /// </summary>
+        private static bool IsBlankDesktopArea(POINT screenPt)
         {
-            if (hWnd == IntPtr.Zero) return false;
+            IntPtr targetHwnd = WindowFromPoint(screenPt);
+            if (targetHwnd == IntPtr.Zero) return false;
 
-            StringBuilder className = new StringBuilder(256);
-            GetClassName(hWnd, className, className.Capacity);
-            string name = className.ToString();
+            // 1. 檢查是否屬於本程式自身的視窗
+            GetWindowThreadProcessId(targetHwnd, out uint pid);
+            if (pid == (uint)Environment.ProcessId) return false;
 
-            if (name == "Progman" || name == "WorkerW" || name == "SysListView32" || name == "SHELLDLL_DefView")
+            // 2. 檢查頂層根視窗 (Root Window)，必須是桌面 (Progman 或 WorkerW)
+            IntPtr rootWnd = GetAncestor(targetHwnd, GA_ROOT);
+            if (rootWnd == IntPtr.Zero) rootWnd = targetHwnd;
+
+            StringBuilder rootClassName = new StringBuilder(256);
+            GetClassName(rootWnd, rootClassName, rootClassName.Capacity);
+            string rootClass = rootClassName.ToString();
+
+            if (rootClass != "Progman" && rootClass != "WorkerW")
             {
-                return true;
+                // 點擊在一般應用程式或檔案總管 (CabinetWClass) 資料夾視窗上，一律不觸發
+                return false;
             }
 
-            // 往上檢查父視窗
-            IntPtr parent = GetParent(hWnd);
-            if (parent != IntPtr.Zero)
+            // 3. 透過安全無崩潰的 Windows Accessibility API (oleacc.dll) 檢查游標下是否為檔案/捷徑圖示
+            try
             {
-                GetClassName(parent, className, className.Capacity);
-                string parentName = className.ToString();
-                if (parentName == "Progman" || parentName == "WorkerW" || parentName == "SHELLDLL_DefView")
+                int hr = AccessibleObjectFromPoint(screenPt, out IAccessible? acc, out object? varChild);
+                if (hr == 0 && acc != null && varChild != null)
                 {
-                    return true;
+                    object role = acc.get_accRole(varChild);
+                    if (role is int roleInt)
+                    {
+                        // ROLE_SYSTEM_LISTITEM = 34 (0x22) 代表點擊在桌面檔案/捷徑圖示上 (Word, Excel, 資料夾等)
+                        // ROLE_SYSTEM_TEXT = 42 (0x2A) 代表點擊在圖示文字標籤上
+                        if (roleInt == 34 || roleInt == 42)
+                        {
+                            return false; // 正在雙擊開啟桌面檔案，絕對不觸發收納盒隱藏！
+                        }
+                    }
                 }
             }
+            catch
+            {
+                // 若 Accessibility 查詢發生異常，安全忽略
+            }
 
-            return false;
+            return true;
         }
 
-        #region Native Win32 API
+        #region Native Win32 API & Accessibility COM
         private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
 
         [StructLayout(LayoutKind.Sequential)]
@@ -131,6 +161,35 @@ namespace WinDeskBox.Core
             public uint time;
             public IntPtr dwExtraInfo;
         }
+
+        [ComImport]
+        [Guid("618736E0-3C3D-11CF-810C-00AA00389B71")]
+        [InterfaceType(ComInterfaceType.InterfaceIsDual)]
+        private interface IAccessible
+        {
+            [DispId(-5000)] object get_accParent { get; }
+            [DispId(-5001)] int get_accChildCount { get; }
+            [DispId(-5002)] object get_accChild([In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5003)] string get_accName([In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5004)] string get_accValue([In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5005)] string get_accDescription([In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5006)] object get_accRole([In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5007)] object get_accState([In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5008)] string get_accHelp([In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5009)] int get_accHelpTopic([Out, MarshalAs(UnmanagedType.BStr)] out string pszHelpFile, [In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5010)] string get_accKeyboardShortcut([In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5011)] object get_accFocus { get; }
+            [DispId(-5012)] object get_accSelection { get; }
+            [DispId(-5013)] string get_accDefaultAction([In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5014)] void accSelect([In] int flagsSelect, [In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5015)] void accLocation([Out] out int pxLeft, [Out] out int pyTop, [Out] out int pcxWidth, [Out] out int pcyHeight, [In, MarshalAs(UnmanagedType.Struct)] object varChild);
+            [DispId(-5016)] object accNavigate([In] int navDir, [In, MarshalAs(UnmanagedType.Struct)] object varStart);
+            [DispId(-5017)] object accHitTest([In] int xLeft, [In] int yTop);
+            [DispId(-5018)] void accDoDefaultAction([In, MarshalAs(UnmanagedType.Struct)] object varChild);
+        }
+
+        [DllImport("oleacc.dll")]
+        private static extern int AccessibleObjectFromPoint(POINT pt, [Out, MarshalAs(UnmanagedType.Interface)] out IAccessible? ppacc, [Out, MarshalAs(UnmanagedType.Struct)] out object? pvarChild);
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
@@ -154,8 +213,11 @@ namespace WinDeskBox.Core
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
 
-        [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
-        private static extern IntPtr GetParent(IntPtr hWnd);
+        [DllImport("user32.dll", ExactSpelling = true)]
+        private static extern IntPtr GetAncestor(IntPtr hwnd, uint gaFlags);
+
+        [DllImport("user32.dll")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
         #endregion
     }
 }

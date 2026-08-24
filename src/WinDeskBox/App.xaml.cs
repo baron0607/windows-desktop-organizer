@@ -76,8 +76,19 @@ namespace WinDeskBox
             }
         }
 
-        private void OnDesktopDoubleClicked()
+        private void OnDesktopDoubleClicked(int screenX, int screenY)
         {
+            // 防呆檢查：若雙擊位置落在任何收納盒視窗範圍內，忽略此事件（不隱藏收納盒）
+            foreach (var fence in _fenceViews)
+            {
+                if (fence.Visibility == Visibility.Visible &&
+                    screenX >= fence.Left && screenX <= (fence.Left + fence.ActualWidth) &&
+                    screenY >= fence.Top && screenY <= (fence.Top + fence.ActualHeight))
+                {
+                    return;
+                }
+            }
+
             _isDesktopHidden = !_isDesktopHidden;
             foreach (var fence in _fenceViews)
             {
