@@ -13,20 +13,20 @@ namespace WinDeskBox
     public partial class App : Application
     {
         private static Mutex? _mutex;
+        private TrayIconManager? _trayManager;
+        private HotkeyManager? _hotkeyManager;
         private AppConfig _config = new();
         public AppConfig Config => _config;
         private readonly List<FenceView> _fenceViews = new();
-        private TrayIconManager? _trayManager;
         private bool _isDesktopHidden = false;
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            // 1. 單一執行個體互斥鎖 (Single Instance Mutex)
-            const string mutexName = "Global\\WinDeskBox_SingleInstance_Mutex";
-            _mutex = new Mutex(true, mutexName, out bool createdNew);
-            if (!createdNew)
+            // 1. 單一執行個體防重複啟動
+            _mutex = new Mutex(true, "WinDeskBox_SingleInstance_Mutex", out bool isNewInstance);
+            if (!isNewInstance)
             {
-                MessageBox.Show("WinDeskBox 桌面收納箱已在背景執行中！\n請由工作列右下角系統匣圖示開啟或管理。", "WinDeskBox 提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("WinDeskBox 桌面收納箱 已經在執行中！\n可透過右下角系統匣圖示或快捷鍵 (Alt + D) 進行操作。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 Shutdown();
                 return;
             }
@@ -39,18 +39,15 @@ namespace WinDeskBox
             // 3. 啟動所有桌面收納盒視窗
             LaunchAllFences();
 
-            // 4. 安裝桌面雙擊全域滑鼠 Hook
-            if (_config.General.DoubleClickHideDesktop)
-            {
-                GlobalHook.DesktopDoubleClicked += OnDesktopDoubleClicked;
-                GlobalHook.Install();
-            }
+            // 4. 註冊全域安全快速鍵 (Alt + D) 切換隱藏/顯示（100% 絕不觸發防毒行為監控）
+            _hotkeyManager = new HotkeyManager(ToggleAllFencesVisibility);
 
             // 5. 註冊多螢幕與解析度自適應防護
             ScreenBoundsGuard.DisplayChanged += OnDisplayChanged;
 
             // 6. 初始化系統匣圖示
             _trayManager = new TrayIconManager(
+                onToggleVisibility: ToggleAllFencesVisibility,
                 onOpenSettings: OpenSettingsWindow,
                 onAddNewBox: AddNewBox,
                 onToggleLockAll: ToggleLockAllBoxes,
@@ -76,19 +73,8 @@ namespace WinDeskBox
             }
         }
 
-        private void OnDesktopDoubleClicked(int screenX, int screenY)
+        public void ToggleAllFencesVisibility()
         {
-            // 防呆檢查：若雙擊位置落在任何收納盒視窗範圍內，忽略此事件（不隱藏收納盒）
-            foreach (var fence in _fenceViews)
-            {
-                if (fence.Visibility == Visibility.Visible &&
-                    screenX >= fence.Left && screenX <= (fence.Left + fence.ActualWidth) &&
-                    screenY >= fence.Top && screenY <= (fence.Top + fence.ActualHeight))
-                {
-                    return;
-                }
-            }
-
             _isDesktopHidden = !_isDesktopHidden;
             foreach (var fence in _fenceViews)
             {
@@ -172,14 +158,14 @@ namespace WinDeskBox
             }
             ConfigManager.Save(_config);
 
-            GlobalHook.Uninstall();
+            _hotkeyManager?.Dispose();
             _trayManager?.Dispose();
             Shutdown();
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
-            GlobalHook.Uninstall();
+            _hotkeyManager?.Dispose();
             _trayManager?.Dispose();
             _mutex?.ReleaseMutex();
             _mutex?.Dispose();

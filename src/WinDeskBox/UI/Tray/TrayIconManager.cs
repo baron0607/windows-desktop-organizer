@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -18,6 +18,8 @@ namespace WinDeskBox.UI.Tray
         private const int WM_RBUTTONUP = 0x0205;
         private const int WM_LBUTTONDBLCLK = 0x0203;
 
+        private const int WM_LBUTTONUP = 0x0202;
+
         private const uint NIM_ADD = 0x00000000;
         private const uint NIM_MODIFY = 0x00000001;
         private const uint NIM_DELETE = 0x00000002;
@@ -30,6 +32,7 @@ namespace WinDeskBox.UI.Tray
         private readonly HwndSource _hwndSource;
         private readonly IntPtr _hwnd;
         private readonly ContextMenu _contextMenu;
+        private readonly Action _onToggleVisibility;
         private readonly Action _onOpenSettings;
         private readonly Action _onAddNewBox;
         private readonly Action<bool> _onToggleLockAll;
@@ -40,11 +43,13 @@ namespace WinDeskBox.UI.Tray
         private MenuItem? _lockMenuItem;
 
         public TrayIconManager(
+            Action onToggleVisibility,
             Action onOpenSettings,
             Action onAddNewBox,
             Action<bool> onToggleLockAll,
             Action onExit)
         {
+            _onToggleVisibility = onToggleVisibility;
             _onOpenSettings = onOpenSettings;
             _onAddNewBox = onAddNewBox;
             _onToggleLockAll = onToggleLockAll;
@@ -79,6 +84,10 @@ namespace WinDeskBox.UI.Tray
             };
             _contextMenu.Items.Add(titleItem);
             _contextMenu.Items.Add(new Separator());
+
+            var toggleItem = new MenuItem { Header = "👁️ 隱藏 / 顯示收納盒 (Alt+D)" };
+            toggleItem.Click += (s, e) => _onToggleVisibility();
+            _contextMenu.Items.Add(toggleItem);
 
             var addBoxItem = new MenuItem { Header = "➕ 新增收納盒" };
             addBoxItem.Click += (s, e) => _onAddNewBox();
@@ -191,6 +200,11 @@ namespace WinDeskBox.UI.Tray
                     // 彈出現代化右鍵選單
                     SetForegroundWindow(_hwnd);
                     _contextMenu.IsOpen = true;
+                    handled = true;
+                }
+                else if (mouseMsg == WM_LBUTTONUP)
+                {
+                    _onToggleVisibility();
                     handled = true;
                 }
                 else if (mouseMsg == WM_LBUTTONDBLCLK)
