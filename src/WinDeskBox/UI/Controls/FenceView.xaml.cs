@@ -246,10 +246,28 @@ namespace WinDeskBox.UI.Controls
             if (viewMode == "List")
             {
                 FilesItemsControl.ItemTemplate = (DataTemplate)FindResource("ListItemTemplate");
+                if (PathViewModeIcon != null)
+                {
+                    // 切換為詳細清單圖示 (條列)
+                    PathViewModeIcon.Data = Geometry.Parse("M3,4H21V6H3V4M3,11H21V13H3V11M3,18H21V20H3V18Z");
+                }
+                if (BtnToggleViewMode != null)
+                {
+                    BtnToggleViewMode.ToolTip = "切換排列模式 (目前為詳細清單，點擊切換為大圖示)";
+                }
             }
             else
             {
                 FilesItemsControl.ItemTemplate = (DataTemplate)FindResource("GridItemTemplate");
+                if (PathViewModeIcon != null)
+                {
+                    // 切換為大圖示 (4 方格)
+                    PathViewModeIcon.Data = Geometry.Parse("M3,11H11V3H3M3,21H11V13H3M13,21H21V13H13M13,3V11H21V3");
+                }
+                if (BtnToggleViewMode != null)
+                {
+                    BtnToggleViewMode.ToolTip = "切換排列模式 (目前為大圖示，點擊切換為詳細清單)";
+                }
             }
         }
         #endregion
@@ -685,11 +703,44 @@ namespace WinDeskBox.UI.Controls
             {
                 PathLockStatus.Visibility = (Config.IsLocked || Config.IsPrivacyLocked) ? Visibility.Visible : Visibility.Collapsed;
             }
+            if (PathLockBtnIcon != null)
+            {
+                if (locked)
+                {
+                    // 閉鎖圖示
+                    PathLockBtnIcon.Data = Geometry.Parse("M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z");
+                }
+                else
+                {
+                    // 開鎖圖示
+                    PathLockBtnIcon.Data = Geometry.Parse("M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10A2,2 0 0,1 6,8H15V6A3,3 0 0,0 12,3A3,3 0 0,0 9,6H7A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,17A2,2 0 0,0 14,15A2,2 0 0,0 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17Z");
+                }
+            }
+            if (BtnToggleLock != null)
+            {
+                BtnToggleLock.ToolTip = locked ? "位置已鎖定 (點擊解鎖)" : "位置未鎖定 (點擊鎖定)";
+                BtnToggleLock.Opacity = locked ? 1.0 : 0.75;
+            }
             if (ResizeGrid != null)
             {
                 ResizeGrid.Visibility = locked ? Visibility.Collapsed : Visibility.Visible;
             }
             ConfigManager.Save(((App)Application.Current).Config);
+        }
+
+        private void BtnOpenFolder_Click(object sender, RoutedEventArgs e)
+        {
+            MenuOpenFolderInExplorer_Click(sender, e);
+        }
+
+        private void BtnToggleViewMode_Click(object sender, RoutedEventArgs e)
+        {
+            MenuToggleViewMode_Click(sender, e);
+        }
+
+        private void BtnToggleLock_Click(object sender, RoutedEventArgs e)
+        {
+            MenuToggleLockPosition_Click(sender, e);
         }
 
         private void BtnRollup_Click(object sender, RoutedEventArgs e)
