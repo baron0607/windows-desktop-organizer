@@ -52,8 +52,16 @@ namespace WinDeskBox.UI.Windows
             {
                 _boxes.Add(b);
             }
-            LstBoxes.ItemsSource = _boxes;
-            LstTabs.ItemsSource = _tabs;
+            // 即時同步收納盒標題文字輸入至左側清單
+            TxtBoxTitle.TextChanged += (s, e) =>
+            {
+                if (_isUpdatingUi) return;
+                if (LstBoxes.SelectedItem is BoxConfig box)
+                {
+                    box.Title = TxtBoxTitle.Text;
+                    LstBoxes.Items.Refresh();
+                }
+            };
 
             // 即時同步分頁名稱與路徑文字輸入
             TxtTabName.TextChanged += (s, e) =>
@@ -96,8 +104,10 @@ namespace WinDeskBox.UI.Windows
             if (LstBoxes.SelectedItem is BoxConfig box)
             {
                 BoxDetailPanel.Visibility = Visibility.Visible;
+                _isUpdatingUi = true;
                 TxtBoxTitle.Text = box.Title;
                 ChkEnableRollup.IsChecked = box.EnableRollup;
+                _isUpdatingUi = false;
 
                 _tabs.Clear();
                 foreach (var t in box.Tabs)
@@ -240,11 +250,13 @@ namespace WinDeskBox.UI.Windows
             {
                 currentBox.Title = TxtBoxTitle.Text.Trim();
                 currentBox.EnableRollup = ChkEnableRollup.IsChecked ?? false;
+                LstBoxes.Items.Refresh();
             }
             if (LstTabs.SelectedItem is TabConfig currentTab)
             {
                 currentTab.Name = TxtTabName.Text.Trim();
                 currentTab.FolderPath = TxtTabFolder.Text.Trim();
+                LstTabs.Items.Refresh();
             }
 
             // 儲存一般設定
