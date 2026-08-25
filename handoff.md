@@ -3,19 +3,21 @@
 > 任何 Agent、任何電腦接手前**必讀**；收工時**必更新**。本檔只放交接必需的精簡資訊，詳細脈絡放 Obsidian（若有 L3）。
 
 ## ⏯️ 目前做到哪
-完成「執行檔檔名與設定視窗版本號 (v1.0.2) 資訊呈現」：
-1. **設定視窗版本呈現**：
-   - 設定視窗頂部標題旁新增 Fluent 藍色版本 Badge 標籤（`v1.0.2`）。
-   - 視窗頂部 Window Title 動態呈現 `WinDeskBox 設定 (v1.0.2)`。
-2. **免安裝執行檔具備版本識別**：
-   - 產出 `build/WinDeskBox-Portable/WinDeskBox-v1.0.2.exe`，同時保留 `WinDeskBox.exe` 相容檔名。
-   - GitHub Release v1.0.2 上傳包含 `WinDeskBox-v1.0.2.exe`。
+完成 **WinDeskBox v1.0.2** 穩定版全部優化與 GitHub Release 清理發布：
+1. **設定視窗版本呈現與執行檔檔名**：
+   - 設定視窗 Header 加入 Fluent 藍色版本 Badge（`v1.0.2`），視窗標題動態顯示 `WinDeskBox 設定 (v1.0.2)`。
+   - 單一執行檔檔名直接標註 `WinDeskBox-v1.0.2.exe`，方便使用者下載與管理辨識。
+2. **GitHub Release v1.0.2 資產清理**：
+   - 已刪除舊的 `WinDeskBox.exe` 重複資產，僅保留唯一清晰之 `WinDeskBox-v1.0.2.exe`（154MB）。
+3. **穩定性修復回顧**：
+   - 原地熱更新（In-Place Hot Update）：儲存時不再銷毀重建視窗，收納盒絕不再跳到最上層遮擋設定畫面。
+   - 座標跳動徹底修復：排除 Windows 最小化 `-32000` 異常座標污染，拖曳縮放即時自動存檔（Auto-Save），點「關閉」不重置視窗。
+   - 標題即時雙向同步：修改收納盒標題隨打字即時同步左側清單。
 
 ## 🚦 目前狀態
-- **產品名稱**：WinDeskBox（桌面收納箱）v1.0.2
+- **產品名稱**：WinDeskBox（桌面收納箱）v1.0.2 正式穩定版
 - **程式發布路徑**：
-  - `build/WinDeskBox-Portable/WinDeskBox-v1.0.2.exe`（帶版本號之免安裝單檔）
-  - `build/WinDeskBox-Portable/WinDeskBox.exe`
+  - `build/WinDeskBox-Portable/WinDeskBox-v1.0.2.exe`（單一免安裝執行檔）
 - **GitHub Release**：https://github.com/baron0607/windows-desktop-organizer/releases/tag/v1.0.2
 - **已實現完整功能**：
   1. **版本資訊清晰呈現**：設定視窗標題與頁首標籤直觀顯示目前版本（v1.0.2），執行檔名亦帶有版本號方便辨識。
@@ -29,9 +31,9 @@
   9. **100% 企業防毒相容**：純標準視窗與快速鍵架構，不觸發 Apex One 行為監控。
 
 ## ➡️ 下一步
-- 使用者體驗帶有版本號之新版設定畫面與執行檔。
+- 開工時可直接啟動 `WinDeskBox-v1.0.2.exe` 進行日常使用或根據後續新需求進行擴充。
 
 ## 🕐 最後更新
-- 時間：2026-08-25 16:13:00
+- 時間：2026-08-25 16:54:00
 - 更新者：Antigravity @ D0A3-PC3132
 - Git push：✅ 已推

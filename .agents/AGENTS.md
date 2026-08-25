@@ -13,8 +13,9 @@
 - [x] 階段一：需求訪談與軟體規劃書定案（確立 WinDeskBox、.NET 8 LTS、Folder Portal 映射、開機自啟、取消即時監聽、資安審查規範）
 - [x] 階段二：Win32 底層核心與收納盒 UI 開發（WorkerW/置底雙模桌面綁定、多螢幕防護、Acrylic 毛玻璃、非同步圖示快取、Roll-up 收合）
 - [x] 階段三：自訂資料夾映射與檔案快速啟動（子目錄與檔案清單、Tabs 分頁、雙擊開啟、拖曳存入與同名防呆）
-- [x] 階段四：開機自啟管理、設定介面、一鍵手動整理與 Portable 單檔打包（`build/WinDeskBox-Portable/WinDeskBox.exe`）
+- [x] 階段四：開機自啟管理、設定介面、一鍵手動整理與 Portable 單檔打包（`build/WinDeskBox-Portable/WinDeskBox-v1.0.2.exe`）
 - [x] 階段五：UI/UX 深度打磨（Windows Shell JUMBO 256x256 超高畫質圖示、Fluent 旗艦毛玻璃微光漸層視覺、WPF 原生 8 向邊框拉伸縮放控制器）
+- [x] 階段六：v1.0.2 穩定性與設定體驗優化（座標有效邊界過濾、Auto-Save 即時持久化、In-Place 原地熱更新不遮擋視窗、版本資訊 Badge 呈現）
 
 ## 資料夾結構
 ```
@@ -30,7 +31,7 @@ Windows桌面整理工具/
 ├── src/
 │   └── WinDeskBox/      # C# .NET 8 (LTS) WPF 完整原始碼
 └── build/
-    └── WinDeskBox-Portable/ # 免安裝單一執行檔（WinDeskBox.exe）
+    └── WinDeskBox-Portable/ # 免安裝單一執行檔（WinDeskBox-v1.0.2.exe）
 ```
 
 ## 同步層級（本專案初始化至第 3 層級）
