@@ -1,4 +1,4 @@
-﻿# Windows桌面整理工具（專案藍圖：WinDeskBox 桌面收納箱）
+# Windows桌面整理工具（專案藍圖：WinDeskBox 桌面收納箱）
 
 > 本檔為跨 Agent 通用的專案藍圖（AGENTS.md 開放標準）。任何 Agent 的每個 session 都應先讀本檔＋`handoff.md`。
 
@@ -23,6 +23,7 @@ Windows桌面整理工具/
 │   └── AGENTS.md        # 專案藍圖（開放標準）
 ├── agents.md            # 專案藍圖（根目錄相容）
 ├── handoff.md           # 跨 Agent / 跨電腦交接檔
+├── README.md            # 繁體中文專案首頁說明文件
 ├── .gitignore           # Git 忽略設定檔
 ├── rdq/
 │   └── RDQ-spec-windows-desktop-organizer-20260819.md # RDQ 規格卡
