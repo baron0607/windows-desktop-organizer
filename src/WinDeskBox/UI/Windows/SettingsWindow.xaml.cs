@@ -52,6 +52,9 @@ namespace WinDeskBox.UI.Windows
             {
                 _boxes.Add(b);
             }
+            LstBoxes.ItemsSource = _boxes;
+            LstTabs.ItemsSource = _tabs;
+
             // 即時同步收納盒標題文字輸入至左側清單
             TxtBoxTitle.TextChanged += (s, e) =>
             {
