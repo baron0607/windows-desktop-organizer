@@ -39,8 +39,8 @@ namespace WinDeskBox
             // 3. 啟動所有桌面收納盒視窗
             LaunchAllFences();
 
-            // 4. 註冊全域安全快速鍵 (Alt + D) 切換隱藏/顯示（100% 絕不觸發防毒行為監控）
-            _hotkeyManager = new HotkeyManager(ToggleAllFencesVisibility);
+            // 4. 註冊全域安全快速鍵切換隱藏/顯示（100% 絕不觸發防毒行為監控）
+            _hotkeyManager = new HotkeyManager(ToggleAllFencesVisibility, _config.General.HotkeyModifiers, _config.General.HotkeyKey);
 
             // 5. 註冊多螢幕與解析度自適應防護
             ScreenBoundsGuard.DisplayChanged += OnDisplayChanged;
@@ -51,7 +51,8 @@ namespace WinDeskBox
                 onOpenSettings: OpenSettingsWindow,
                 onAddNewBox: AddNewBox,
                 onToggleLockAll: ToggleLockAllBoxes,
-                onExit: ExitApplication
+                onExit: ExitApplication,
+                hotkeyDisplay: _config.General.HotkeyDisplayString
             );
         }
 
@@ -95,6 +96,8 @@ namespace WinDeskBox
         public void ReloadAllFences()
         {
             _config = ConfigManager.Load();
+            _hotkeyManager?.UpdateHotkey(_config.General.HotkeyModifiers, _config.General.HotkeyKey);
+            _trayManager?.UpdateHotkeyDisplay(_config.General.HotkeyDisplayString);
             LaunchAllFences();
         }
 

@@ -1,4 +1,4 @@
-﻿<Window x:Class="WinDeskBox.UI.Windows.SettingsWindow"
+<Window x:Class="WinDeskBox.UI.Windows.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="WinDeskBox 設定"
@@ -29,11 +29,29 @@
             <TabItem Header="⚙️ 一般設定">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="15">
                     <StackPanel>
-                        <CheckBox x:Name="ChkStartup" Content="隨 Windows 開機自動啟動 (Launch on Startup)" Foreground="White" FontSize="13" Margin="0,8,0,10" />
-                        <CheckBox x:Name="ChkDoubleClickHide" Content="雙擊桌面空白處一鍵隱藏/顯示所有收納盒" Foreground="White" FontSize="13" Margin="0,5,0,10" />
-                        <CheckBox x:Name="ChkGlobalLock" Content="全域鎖定所有收納盒位置 (禁止拖曳與縮放)" Foreground="White" FontSize="13" Margin="0,5,0,20" />
+                        <CheckBox x:Name="ChkStartup" Content="隨 Windows 開機自動啟動 (Launch on Startup)" Foreground="White" FontSize="13" Margin="0,8,0,12" />
+                        <CheckBox x:Name="ChkGlobalLock" Content="全域鎖定所有收納盒位置 (禁止拖曳與縮放)" Foreground="White" FontSize="13" Margin="0,0,0,16" />
 
-                        <Separator Background="#35FFFFFF" Margin="0,5,0,15" />
+                        <!-- 全域切換隱藏 / 顯示快速鍵自訂設定卡片 -->
+                        <Border Background="#1F1F1F" CornerRadius="6" BorderBrush="#35FFFFFF" BorderThickness="1" Padding="12" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="⌨️ 全域切換收納盒 隱藏 / 顯示 快速鍵：" FontWeight="SemiBold" FontSize="13.5" Foreground="#FFFFFF" />
+                                <TextBlock Text="按下設定的快速鍵即可一秒切換所有收納盒之顯示或隱藏（100% 企業防毒相容）" FontSize="11.5" Foreground="#AAAAAA" Margin="0,2,0,10" />
+
+                                <WrapPanel VerticalAlignment="Center">
+                                    <TextBlock Text="組合修飾鍵：" Foreground="#DDDDDD" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12.5" />
+                                    <CheckBox x:Name="ChkModAlt" Content="Alt" Foreground="White" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                    <CheckBox x:Name="ChkModCtrl" Content="Ctrl" Foreground="White" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                    <CheckBox x:Name="ChkModShift" Content="Shift" Foreground="White" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                    <CheckBox x:Name="ChkModWin" Content="Win" Foreground="White" VerticalAlignment="Center" Margin="0,0,16,0" />
+
+                                    <TextBlock Text="＋  主按鍵：" Foreground="#DDDDDD" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12.5" />
+                                    <ComboBox x:Name="CmbHotkeyKey" Width="90" Height="26" VerticalAlignment="Center" Background="#141414" Foreground="White" BorderBrush="#40FFFFFF" Padding="6,2" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Separator Background="#35FFFFFF" Margin="0,0,0,15" />
 
                         <TextBlock Text="🧹 桌面一鍵整理工具" FontWeight="SemiBold" FontSize="14" Foreground="White" Margin="0,0,0,10" />
                         <StackPanel Orientation="Horizontal">

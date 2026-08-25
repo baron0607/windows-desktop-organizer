@@ -118,9 +118,20 @@ namespace WinDeskBox.Config
         public bool LaunchOnStartup { get; set; } = true;
 
         /// <summary>
-        /// 是否啟用雙擊桌面空白處一鍵隱藏/顯示所有收納盒
+        /// 全域切換隱藏/顯示快速鍵之修飾鍵（如 "Alt", "Ctrl + Alt", "Win + Alt" 等）
         /// </summary>
-        public bool DoubleClickHideDesktop { get; set; } = true;
+        public string HotkeyModifiers { get; set; } = "Alt";
+
+        /// <summary>
+        /// 全域切換隱藏/顯示快速鍵之主按鍵（如 "D", "H", "Space", "F1" 等）
+        /// </summary>
+        public string HotkeyKey { get; set; } = "D";
+
+        /// <summary>
+        /// 取得快速鍵完整可讀名稱（例如 "Alt + D"）
+        /// </summary>
+        [JsonIgnore]
+        public string HotkeyDisplayString => string.IsNullOrWhiteSpace(HotkeyModifiers) ? HotkeyKey : $"{HotkeyModifiers} + {HotkeyKey}";
 
         /// <summary>
         /// 視窗邊緣與收納盒間磁吸吸附距離 (像素)

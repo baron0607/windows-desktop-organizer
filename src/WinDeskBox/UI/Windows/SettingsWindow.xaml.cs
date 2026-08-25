@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -24,8 +24,27 @@ namespace WinDeskBox.UI.Windows
 
             // 載入一般設定
             ChkStartup.IsChecked = _config.General.LaunchOnStartup;
-            ChkDoubleClickHide.IsChecked = _config.General.DoubleClickHideDesktop;
             ChkGlobalLock.IsChecked = _config.General.GlobalLockPositions;
+
+            // 初始化快速鍵按鍵下拉清單
+            var availableKeys = new System.Collections.Generic.List<string>();
+            for (char c = 'A'; c <= 'Z'; c++) availableKeys.Add(c.ToString());
+            for (char c = '0'; c <= '9'; c++) availableKeys.Add(c.ToString());
+            for (int f = 1; f <= 12; f++) availableKeys.Add($"F{f}");
+            availableKeys.Add("Space");
+            availableKeys.Add("Tab");
+            availableKeys.Add("~");
+            CmbHotkeyKey.ItemsSource = availableKeys;
+
+            // 載入當前快速鍵設定
+            string currentMods = _config.General.HotkeyModifiers ?? "Alt";
+            ChkModAlt.IsChecked = currentMods.Contains("Alt", StringComparison.OrdinalIgnoreCase);
+            ChkModCtrl.IsChecked = currentMods.Contains("Ctrl", StringComparison.OrdinalIgnoreCase);
+            ChkModShift.IsChecked = currentMods.Contains("Shift", StringComparison.OrdinalIgnoreCase);
+            ChkModWin.IsChecked = currentMods.Contains("Win", StringComparison.OrdinalIgnoreCase);
+
+            string currentKey = _config.General.HotkeyKey ?? "D";
+            CmbHotkeyKey.SelectedItem = availableKeys.FirstOrDefault(k => string.Equals(k, currentKey, StringComparison.OrdinalIgnoreCase)) ?? "D";
 
             // 載入收納盒清單
             foreach (var b in _config.Boxes)
@@ -230,8 +249,18 @@ namespace WinDeskBox.UI.Windows
             // 儲存一般設定
             bool startup = ChkStartup.IsChecked ?? true;
             _config.General.LaunchOnStartup = startup;
-            _config.General.DoubleClickHideDesktop = ChkDoubleClickHide.IsChecked ?? true;
             _config.General.GlobalLockPositions = ChkGlobalLock.IsChecked ?? false;
+
+            // 儲存快速鍵組合
+            var modsList = new System.Collections.Generic.List<string>();
+            if (ChkModCtrl.IsChecked == true) modsList.Add("Ctrl");
+            if (ChkModAlt.IsChecked == true) modsList.Add("Alt");
+            if (ChkModShift.IsChecked == true) modsList.Add("Shift");
+            if (ChkModWin.IsChecked == true) modsList.Add("Win");
+            if (modsList.Count == 0) modsList.Add("Alt"); // 若皆未勾選，預設保留 Alt
+
+            _config.General.HotkeyModifiers = string.Join(" + ", modsList);
+            _config.General.HotkeyKey = (CmbHotkeyKey.SelectedItem as string) ?? "D";
 
             // 同步開機啟動狀態
             StartupManager.SetStartup(startup);

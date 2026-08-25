@@ -41,19 +41,23 @@ namespace WinDeskBox.UI.Tray
         private IntPtr _hTrayIcon = IntPtr.Zero;
         private bool _isAllLocked = false;
         private MenuItem? _lockMenuItem;
+        private MenuItem? _toggleMenuItem;
+        private string _hotkeyDisplay = "Alt + D";
 
         public TrayIconManager(
             Action onToggleVisibility,
             Action onOpenSettings,
             Action onAddNewBox,
             Action<bool> onToggleLockAll,
-            Action onExit)
+            Action onExit,
+            string hotkeyDisplay = "Alt + D")
         {
             _onToggleVisibility = onToggleVisibility;
             _onOpenSettings = onOpenSettings;
             _onAddNewBox = onAddNewBox;
             _onToggleLockAll = onToggleLockAll;
             _onExit = onExit;
+            _hotkeyDisplay = hotkeyDisplay;
 
             // 建立隱藏的訊息視窗以接收系統匣滑鼠點擊
             var parameters = new HwndSourceParameters("WinDeskBox_TrayMsgWindow")
@@ -72,6 +76,15 @@ namespace WinDeskBox.UI.Tray
             AddTrayIcon();
         }
 
+        public void UpdateHotkeyDisplay(string hotkeyText)
+        {
+            _hotkeyDisplay = hotkeyText;
+            if (_toggleMenuItem != null)
+            {
+                _toggleMenuItem.Header = $"👁️ 隱藏 / 顯示收納盒 ({hotkeyText})";
+            }
+        }
+
         private void InitializeMenu()
         {
             _contextMenu.Items.Clear();
@@ -85,9 +98,9 @@ namespace WinDeskBox.UI.Tray
             _contextMenu.Items.Add(titleItem);
             _contextMenu.Items.Add(new Separator());
 
-            var toggleItem = new MenuItem { Header = "👁️ 隱藏 / 顯示收納盒 (Alt+D)" };
-            toggleItem.Click += (s, e) => _onToggleVisibility();
-            _contextMenu.Items.Add(toggleItem);
+            _toggleMenuItem = new MenuItem { Header = $"👁️ 隱藏 / 顯示收納盒 ({_hotkeyDisplay})" };
+            _toggleMenuItem.Click += (s, e) => _onToggleVisibility();
+            _contextMenu.Items.Add(_toggleMenuItem);
 
             var addBoxItem = new MenuItem { Header = "➕ 新增收納盒" };
             addBoxItem.Click += (s, e) => _onAddNewBox();
