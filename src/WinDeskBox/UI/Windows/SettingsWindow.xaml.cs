@@ -16,6 +16,7 @@ namespace WinDeskBox.UI.Windows
         private readonly ObservableCollection<BoxConfig> _boxes = new();
         private readonly ObservableCollection<TabConfig> _tabs = new();
         private bool _isUpdatingUi = false;
+        public bool HasSavedChanges { get; private set; } = false;
 
         public SettingsWindow(AppConfig config, string? targetBoxId = null)
         {
@@ -273,6 +274,7 @@ namespace WinDeskBox.UI.Windows
             }
 
             ConfigManager.Save(_config);
+            HasSavedChanges = true;
 
             // 立即即時套用變更至桌面所有收納盒與系統匣，不關閉視窗
             if (Application.Current is App app)

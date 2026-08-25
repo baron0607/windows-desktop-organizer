@@ -95,6 +95,18 @@ namespace WinDeskBox
 
         public void ReloadAllFences()
         {
+            // 在重新載入前，同步記錄當前視窗中有效的實際座標
+            foreach (var fence in _fenceViews)
+            {
+                if (fence.WindowState == WindowState.Normal && fence.Left > -10000 && fence.Top > -10000)
+                {
+                    fence.Config.Left = fence.Left;
+                    fence.Config.Top = fence.Top;
+                    fence.Config.Width = fence.Width;
+                    if (!fence.IsCollapsed && fence.Height > 50) fence.Config.Height = fence.Height;
+                }
+            }
+
             _config = ConfigManager.Load();
             _hotkeyManager?.UpdateHotkey(_config.General.HotkeyModifiers, _config.General.HotkeyKey);
             _trayManager?.UpdateHotkeyDisplay(_config.General.HotkeyDisplayString);
@@ -103,9 +115,27 @@ namespace WinDeskBox
 
         public void OpenSettingsForBox(string? boxId = null)
         {
+            // 開啟設定前，先把當前畫面上所有正常的 FenceView 實際座標同步並存檔
+            foreach (var fence in _fenceViews)
+            {
+                if (fence.WindowState == WindowState.Normal && fence.Left > -10000 && fence.Top > -10000)
+                {
+                    fence.Config.Left = fence.Left;
+                    fence.Config.Top = fence.Top;
+                    fence.Config.Width = fence.Width;
+                    if (!fence.IsCollapsed && fence.Height > 50) fence.Config.Height = fence.Height;
+                }
+            }
+            ConfigManager.Save(_config);
+
             var settings = new SettingsWindow(_config, boxId);
             settings.ShowDialog();
-            ReloadAllFences();
+
+            // 若在設定視窗中有儲存變更，才進行熱鍵與視窗重載；單純點「關閉」則不重置視窗
+            if (settings.HasSavedChanges)
+            {
+                ReloadAllFences();
+            }
         }
 
         private void OpenSettingsWindow()

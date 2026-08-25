@@ -24,6 +24,7 @@ namespace WinDeskBox.UI.Controls
 
         private FolderPortalWatcher? _portalWatcher;
         private bool _isCollapsed = false;
+        public bool IsCollapsed => _isCollapsed;
         private double _expandedHeight = 280;
 
         public static readonly IValueConverter BoolToVis = new BooleanToVisibilityConverter();
@@ -35,6 +36,13 @@ namespace WinDeskBox.UI.Controls
             Config = config;
             DataContext = this;
             FilesItemsControl.ItemsSource = FileItems;
+
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Left = Config.Left;
+            Top = Config.Top;
+            Width = Config.Width;
+            Height = Config.Height;
+            _expandedHeight = Config.Height;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -64,7 +72,7 @@ namespace WinDeskBox.UI.Controls
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (!_isCollapsed && IsLoaded)
+            if (!_isCollapsed && IsLoaded && WindowState == WindowState.Normal && Width > 50 && Height > 50)
             {
                 Config.Width = Width;
                 Config.Height = Height;
@@ -74,7 +82,7 @@ namespace WinDeskBox.UI.Controls
 
         private void Window_LocationChanged(object sender, EventArgs e)
         {
-            if (IsLoaded)
+            if (IsLoaded && WindowState == WindowState.Normal && Left > -10000 && Top > -10000)
             {
                 Config.Left = Left;
                 Config.Top = Top;
@@ -596,10 +604,18 @@ namespace WinDeskBox.UI.Controls
 
         private void SavePosition()
         {
-            Config.Left = Left;
-            Config.Top = Top;
-            Config.Width = Width;
-            if (!_isCollapsed) Config.Height = Height;
+            if (WindowState == WindowState.Normal && Left > -10000 && Top > -10000)
+            {
+                Config.Left = Left;
+                Config.Top = Top;
+                Config.Width = Width;
+                if (!_isCollapsed && Height > 50) Config.Height = Height;
+
+                if (Application.Current is App app)
+                {
+                    ConfigManager.Save(app.Config);
+                }
+            }
         }
 
         private void BtnHamburgerMenu_Click(object sender, RoutedEventArgs e)
