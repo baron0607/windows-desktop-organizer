@@ -70,6 +70,29 @@ namespace WinDeskBox.UI.Controls
             SwitchToTab(Config.ActiveTabIndex);
         }
 
+        /// <summary>
+        /// 原地熱更新收納盒設定（不重建視窗、不搶焦點、不影響置底 Z-order）
+        /// </summary>
+        public void ApplyUpdatedConfig(BoxConfig newConfig)
+        {
+            Config.Title = newConfig.Title;
+            TxtBoxTitle.Text = Config.Title;
+            Config.EnableRollup = newConfig.EnableRollup;
+
+            Config.Tabs.Clear();
+            Config.Tabs.AddRange(newConfig.Tabs);
+            if (Config.Tabs.Count == 0)
+            {
+                Config.Tabs.Add(new TabConfig { Name = "預設分頁", FolderPath = string.Empty });
+            }
+
+            RenderTabs();
+            SwitchToTab(Math.Min(Config.ActiveTabIndex, Math.Max(0, Config.Tabs.Count - 1)));
+
+            // 確保依然釘在桌面底層圖層
+            DesktopWorker.PinToDesktopBottom(this);
+        }
+
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (!_isCollapsed && IsLoaded && WindowState == WindowState.Normal && Width > 50 && Height > 50)

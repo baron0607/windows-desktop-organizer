@@ -297,7 +297,7 @@ namespace WinDeskBox.UI.Windows
                 app.ReloadAllFences();
             }
 
-            MessageBox.Show("設定已成功儲存並即時套用！", "儲存成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(this, "設定已成功儲存並即時套用！", "儲存成功", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)

@@ -110,7 +110,41 @@ namespace WinDeskBox
             _config = ConfigManager.Load();
             _hotkeyManager?.UpdateHotkey(_config.General.HotkeyModifiers, _config.General.HotkeyKey);
             _trayManager?.UpdateHotkeyDisplay(_config.General.HotkeyDisplayString);
-            LaunchAllFences();
+            
+            // 原地熱更新現存視窗，避免關閉重建導致新視窗被 Windows 啟用跳到最上層擋住設定畫面
+            SyncAllFences();
+        }
+
+        private void SyncAllFences()
+        {
+            var existingViews = new List<FenceView>(_fenceViews);
+            var targetBoxes = _config.Boxes;
+
+            // 1. 關閉已被使用者在設定中刪除的收納盒
+            foreach (var view in existingViews)
+            {
+                if (!targetBoxes.Exists(b => b.Id == view.Config.Id))
+                {
+                    view.Close();
+                    _fenceViews.Remove(view);
+                }
+            }
+
+            // 2. 原地熱更新現存收納盒設定，若是新建立的才呼叫 Show
+            foreach (var boxConfig in targetBoxes)
+            {
+                var existingView = _fenceViews.Find(v => v.Config.Id == boxConfig.Id);
+                if (existingView != null)
+                {
+                    existingView.ApplyUpdatedConfig(boxConfig);
+                }
+                else
+                {
+                    var newView = new FenceView(boxConfig);
+                    newView.Show();
+                    _fenceViews.Add(newView);
+                }
+            }
         }
 
         public void OpenSettingsForBox(string? boxId = null)
