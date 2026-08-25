@@ -196,8 +196,6 @@
                                     <MenuItem Header="🔒 鎖定位置 (禁止拖曳與縮放)" Click="MenuToggleLockPosition_Click" />
                                     <MenuItem Header="🛡️ 隱私防護鎖定 (顯示解鎖盾牌)" Click="MenuTogglePrivacy_Click" />
                                     <MenuItem Header="✏️ 重新命名此收納盒..." Click="MenuRenameBox_Click" />
-                                    <Separator />
-                                    <MenuItem Header="🧹 立即整理桌面散亂檔案" Click="MenuOrganizeDesktop_Click" />
                                 </ContextMenu>
                             </Button.ContextMenu>
                         </Button>
@@ -213,7 +211,7 @@
                                        SnapsToDevicePixels="True" UseLayoutRounding="True" />
                         </StackPanel>
 
-                        <!-- 右側功能按鈕群（紅框區域：開啟資料夾、切換模式、鎖定位置 ＋ 收合按鈕） -->
+                        <!-- 右側功能按鈕群（紅框區域：開啟資料夾、切換模式、鎖定位置、隱私防護 ＋ 收合按鈕） -->
                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" SnapsToDevicePixels="True" UseLayoutRounding="True">
                             <!-- 1. 在檔案總管中開啟本機資料夾 (📁) -->
                             <Button x:Name="BtnOpenFolder" Style="{DynamicResource FluentIconButton}" ToolTip="在檔案總管中開啟本機資料夾" Click="BtnOpenFolder_Click" Width="20" Height="20" Padding="2" Margin="0,0,2,0" SnapsToDevicePixels="True">
@@ -233,7 +231,13 @@
                                       Fill="#FFFFFF" Stretch="Uniform" Width="10" Height="10" SnapsToDevicePixels="True" />
                             </Button>
 
-                            <!-- 4. 右側折疊/展開按鈕 (⌄) -->
+                            <!-- 4. 隱私防護鎖定按鈕 (🛡️ 顯示解鎖盾牌) -->
+                            <Button x:Name="BtnTogglePrivacy" Style="{DynamicResource FluentIconButton}" ToolTip="隱私防護鎖定 (顯示解鎖盾牌)" Click="BtnTogglePrivacy_Click" Width="20" Height="20" Padding="2" Margin="0,0,2,0" SnapsToDevicePixels="True">
+                                <Path x:Name="PathPrivacyBtnIcon" Data="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,5A6,6 0 0,1 18,11C18,14.4 15.54,17.47 12,18.42V5Z"
+                                      Fill="#FFFFFF" Stretch="Uniform" Width="10" Height="10" SnapsToDevicePixels="True" />
+                            </Button>
+
+                            <!-- 5. 右側折疊/展開按鈕 (⌄) -->
                             <Button x:Name="BtnRollup" Style="{DynamicResource FluentIconButton}" ToolTip="收合/展開收納盒" Click="BtnRollup_Click" Width="20" Height="20" Padding="2" SnapsToDevicePixels="True">
                                 <Path x:Name="PathRollupIcon" Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
                                       Fill="#FFFFFF" Stretch="Uniform" Width="10" Height="10" SnapsToDevicePixels="True" />

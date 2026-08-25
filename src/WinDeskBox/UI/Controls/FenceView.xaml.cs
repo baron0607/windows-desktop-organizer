@@ -693,6 +693,11 @@ namespace WinDeskBox.UI.Controls
             {
                 PathLockStatus.Visibility = (Config.IsLocked || Config.IsPrivacyLocked) ? Visibility.Visible : Visibility.Collapsed;
             }
+            if (BtnTogglePrivacy != null)
+            {
+                BtnTogglePrivacy.ToolTip = locked ? "隱私防護已啟用 (雙擊畫面解鎖)" : "隱私防護鎖定 (顯示解鎖盾牌)";
+                BtnTogglePrivacy.Opacity = locked ? 1.0 : 0.75;
+            }
             ConfigManager.Save(((App)Application.Current).Config);
         }
 
@@ -741,6 +746,11 @@ namespace WinDeskBox.UI.Controls
         private void BtnToggleLock_Click(object sender, RoutedEventArgs e)
         {
             MenuToggleLockPosition_Click(sender, e);
+        }
+
+        private void BtnTogglePrivacy_Click(object sender, RoutedEventArgs e)
+        {
+            UpdatePrivacyLockState(!Config.IsPrivacyLocked);
         }
 
         private void BtnRollup_Click(object sender, RoutedEventArgs e)
