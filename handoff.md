@@ -3,17 +3,16 @@
 > 任何 Agent、任何電腦接手前**必讀**；收工時**必更新**。本檔只放交接必需的精簡資訊，詳細脈絡放 Obsidian（若有 L3）。
 
 ## ⏯️ 目前做到哪
-完成「收納盒原地熱更新（In-Place Hot Update）」修復：
-1. **原地熱更新機制**：
-   - 設定視窗點擊「儲存並套用」時，`App.xaml.cs` 改採 `SyncAllFences()` 比對更新，直接對現有 `FenceView` 執行 `ApplyUpdatedConfig()` 更新標題、分頁、路徑與樣式。
-   - **完全不再執行 `view.Close()` 與重新 `new FenceView().Show()`**，徹底杜絕視窗重新開啟時被 Windows 系統啟動至最前台而遮擋設定畫面的問題。
-   - 提示彈窗指定 `SettingsWindow` 為 Owner，確保提示訊息始終鎖定在設定視窗中央。
-2. **發布免安裝單一執行檔**：
-   - 發布至 `build/WinDeskBox-Portable/WinDeskBox.exe`（Self-Contained 單檔免安裝，100% 企業防毒相容）。
+完成 **WinDeskBox v1.0.2** 正式版發布與 GitHub Release：
+1. **原地熱更新（In-Place Hot Update）**：點選「儲存並套用」時收納盒在桌面底層靜態更新，絕不銷毀重開、絕不搶焦點、絕不跳到最上層遮擋設定畫面。
+2. **座標精準防護**：排除 Windows 最小化 `-32000` 異常座標污染，拖曳縮放即時自動存檔，點「關閉」不重置視窗。
+3. **標題即時雙向同步**：設定面板修改收納盒標題與分頁名稱，左側清單即時同步反饋。
+4. **發布 GitHub Release v1.0.2**：已成功推送 Tag `v1.0.2` 並上傳免安裝單一執行檔 `WinDeskBox.exe`。
 
 ## 🚦 目前狀態
-- **產品名稱**：WinDeskBox（桌面收納箱）v1.0.1 (最新版)
-- **程式發布路徑**：`build/WinDeskBox-Portable/WinDeskBox.exe`（單一獨立免安裝執行檔，目前此版可正常執行）。
+- **產品名稱**：WinDeskBox（桌面收納箱）v1.0.2 正式版
+- **程式發布路徑**：`build/WinDeskBox-Portable/WinDeskBox.exe`
+- **GitHub Release**：https://github.com/baron0607/windows-desktop-organizer/releases/tag/v1.0.2
 - **已實現完整功能**：
   1. **原地熱更新無縫套用**：點選「儲存並套用」時收納盒安穩保持在桌面最底層，不閃爍、不重建、不跳至上層遮擋設定。
   2. **標題即時同步**：設定視窗修改收納盒標題與分頁名稱，左側清單即時同步反饋。
@@ -25,9 +24,9 @@
   8. **100% 企業防毒相容**：純標準視窗與快速鍵架構，不觸發 Apex One 行為監控。
 
 ## ➡️ 下一步
-- 使用者點選「儲存並套用」，驗證收納盒在背景靜態更新且絕不再跳到最前台遮擋設定畫面。
+- 使用者測試體驗 v1.0.2。
 
 ## 🕐 最後更新
-- 時間：2026-08-25 15:25:00
+- 時間：2026-08-25 15:36:00
 - 更新者：Antigravity @ D0A3-PC3132
 - Git push：✅ 已推
