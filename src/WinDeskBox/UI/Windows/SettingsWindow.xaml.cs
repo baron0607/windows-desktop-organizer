@@ -23,6 +23,11 @@ namespace WinDeskBox.UI.Windows
             InitializeComponent();
             _config = config;
 
+            // 動態讀取當前組件版本號並呈現於視窗標題與頁首標籤
+            string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.2";
+            Title = $"WinDeskBox 設定 (v{appVersion})";
+            TxtAppVersion.Text = $"v{appVersion}";
+
             // 載入一般設定
             ChkStartup.IsChecked = _config.General.LaunchOnStartup;
             ChkGlobalLock.IsChecked = _config.General.GlobalLockPositions;
