@@ -273,8 +273,14 @@ namespace WinDeskBox.UI.Windows
             }
 
             ConfigManager.Save(_config);
-            DialogResult = true;
-            Close();
+
+            // 立即即時套用變更至桌面所有收納盒與系統匣，不關閉視窗
+            if (Application.Current is App app)
+            {
+                app.ReloadAllFences();
+            }
+
+            MessageBox.Show("設定已成功儲存並即時套用！", "儲存成功", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)

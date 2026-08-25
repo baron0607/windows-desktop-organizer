@@ -104,10 +104,8 @@ namespace WinDeskBox
         public void OpenSettingsForBox(string? boxId = null)
         {
             var settings = new SettingsWindow(_config, boxId);
-            if (settings.ShowDialog() == true)
-            {
-                ReloadAllFences();
-            }
+            settings.ShowDialog();
+            ReloadAllFences();
         }
 
         private void OpenSettingsWindow()
