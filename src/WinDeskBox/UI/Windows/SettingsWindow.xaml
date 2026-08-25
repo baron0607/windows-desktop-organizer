@@ -46,7 +46,7 @@
                                     <CheckBox x:Name="ChkModWin" Content="Win" Foreground="White" VerticalAlignment="Center" Margin="0,0,16,0" />
 
                                     <TextBlock Text="＋  主按鍵：" Foreground="#DDDDDD" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12.5" />
-                                    <ComboBox x:Name="CmbHotkeyKey" Width="90" Height="26" VerticalAlignment="Center" Background="#141414" Foreground="White" BorderBrush="#40FFFFFF" Padding="6,2" />
+                                    <ComboBox x:Name="CmbHotkeyKey" Width="90" Height="26" VerticalAlignment="Center" />
                                 </WrapPanel>
                             </StackPanel>
                         </Border>
