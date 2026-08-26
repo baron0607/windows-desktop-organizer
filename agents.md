@@ -25,6 +25,8 @@ Windows桌面整理工具/
 ├── agents.md            # 專案藍圖（根目錄相容）
 ├── handoff.md           # 跨 Agent / 跨電腦交接檔
 ├── README.md            # 繁體中文專案首頁說明文件
+├── docs/
+│   └── USER_GUIDE.md    # 繁體中文詳細軟體使用說明書
 ├── .gitignore           # Git 忽略設定檔
 ├── rdq/
 │   └── RDQ-spec-windows-desktop-organizer-20260819.md # RDQ 規格卡
