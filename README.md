@@ -1,18 +1,18 @@
-﻿# 📦 WinDeskBox 桌面收納箱 (Windows Desktop Organizer)
+# 📦 WinDeskBox 桌面收納箱 (Windows Desktop Organizer)
 
 <div align="center">
 
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(64--bit)-0078D4?logo=windows&logoColor=white)
 ![Framework](https://img.shields.io/badge/.NET-8.0%20LTS-512BD4?logo=dotnet&logoColor=white)
 ![Type](https://img.shields.io/badge/Type-Portable%20Single--File-green)
-![Version](https://img.shields.io/badge/Version-v1.0.1-blue)
+![Version](https://img.shields.io/badge/Version-v1.0.2-blue)
 ![Security](https://img.shields.io/badge/Security-Apex%20One%20Compatible-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-orange)
 
 **專為 Windows 11 / 10 打造的輕量、高效、免安裝（Portable）現代桌面分區與資料夾映射收納工具**  
-*Fluent 微光毛玻璃質感 ｜ 自訂資料夾映射 ｜ Tabs 分頁 ｜ 隱私防護盾牌 ｜ 8 向自由縮放 ｜ 100% 企業防毒相容*
+*Fluent 微光毛玻璃質感 ｜ 自訂資料夾映射 ｜ Tabs 分頁 ｜ 隱私防護盾牌 ｜ 8 向自由縮放 ｜ 原地熱更新 ｜ 100% 企業防毒相容*
 
-[📥 立即下載最新免安裝版 (WinDeskBox.exe)](https://github.com/baron0607/windows-desktop-organizer/releases/latest)
+[📥 立即下載最新免安裝版 (WinDeskBox-v1.0.2.exe)](https://github.com/baron0607/windows-desktop-organizer/releases/latest) ｜ [📖 詳細使用說明書 (User Guide)](docs/USER_GUIDE.md)
 
 </div>
 
@@ -62,13 +62,29 @@
 
 ## 📥 下載與快速開始 (Quick Start)
 
-1. 前往 **[Releases 頁面](https://github.com/baron0607/windows-desktop-organizer/releases/latest)** 下載最新版的 `WinDeskBox.exe`。
-2. 將 `WinDeskBox.exe` 放置在您習慣的資料夾（如 `D:\Tools\WinDeskBox` 或隨身碟）。
-3. 雙擊執行 `WinDeskBox.exe` 即可立即開始使用！
+1. 前往 **[Releases 頁面](https://github.com/baron0607/windows-desktop-organizer/releases/latest)** 下載最新版的 `WinDeskBox-v1.0.2.exe`。
+2. 將 `WinDeskBox-v1.0.2.exe` 放置在您習慣的資料夾（如 `D:\Tools\WinDeskBox` 或隨身碟）。
+3. 雙擊執行 `WinDeskBox-v1.0.2.exe` 即可立即開始使用！
 
 ---
 
-## ⚙️ 介面與操作指引 (Usage Guide)
+## 📖 完整詳細使用說明書
+
+想要深入了解各項強大功能與實戰技巧，請參閱我們的完整手冊：
+👉 **[《WinDeskBox 桌面收納箱 v1.0.2 詳細使用說明書》](docs/USER_GUIDE.md)**
+
+包含：
+- 標題列 5 大快捷按鈕詳解
+- 8 向邊框自由縮放與智慧吸附
+- Folder Portal 資料夾映射與 Tabs 分頁配置推薦
+- 設定中心（開機自啟、全域自訂快速鍵、一鍵桌面整理與還原）
+- 原地熱更新機制（In-Place Hot Update）
+- 100% 企業防毒相容與資安保證
+- 常見問題與疑難排解 (FAQ)
+
+---
+
+## ⚙️ 介面與操作快速指引 (Quick Usage)
 
 ### 標題列快捷功能按鈕
 
@@ -87,7 +103,7 @@
 - 右鍵點擊系統匣圖示或收納盒漢堡選單中的 **「⚙️ 收納盒與資料夾映射設定...」** 進入設定視窗。
 - **開機自動啟動**：隨 Windows 開機自動背景啟動。
 - **快速鍵自訂**：可自由配置組合鍵（`Alt` / `Ctrl` / `Shift` / `Win`）＋主按鍵。
-- **儲存不退出**：點擊「💾 儲存並套用」時會立即生效且保持視窗開啟，確認完成後點擊「關閉」退出。
+- **原地熱更新儲存**：點擊「💾 儲存並套用」時在背景無縫即時生效，不關閉視窗、不搶焦點。
 
 ---
 
