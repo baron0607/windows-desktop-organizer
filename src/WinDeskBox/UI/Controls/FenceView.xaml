@@ -36,7 +36,7 @@
         <DataTemplate x:Key="GridItemTemplate" DataType="{x:Type local:FileItemViewModel}">
             <Border x:Name="ItemBorder" Width="82" Height="86" Margin="3" CornerRadius="3" Background="Transparent"
                     BorderThickness="1" BorderBrush="Transparent"
-                    ToolTip="{Binding FullPath}" Cursor="Hand" MouseLeftButtonDown="Item_MouseLeftButtonDown"
+                    ToolTip="{Binding FullPath}" Cursor="Arrow" MouseLeftButtonDown="Item_MouseLeftButtonDown"
                     SnapsToDevicePixels="True" UseLayoutRounding="True">
                 <Border.ContextMenu>
                     <ContextMenu>
@@ -86,7 +86,7 @@
         <DataTemplate x:Key="ListItemTemplate" DataType="{x:Type local:FileItemViewModel}">
             <Border x:Name="ItemBorder" Height="30" Margin="2,1" CornerRadius="3" Background="Transparent"
                     BorderThickness="1" BorderBrush="Transparent"
-                    ToolTip="{Binding FullPath}" Cursor="Hand" MouseLeftButtonDown="Item_MouseLeftButtonDown"
+                    ToolTip="{Binding FullPath}" Cursor="Arrow" MouseLeftButtonDown="Item_MouseLeftButtonDown"
                     SnapsToDevicePixels="True" UseLayoutRounding="True">
                 <Border.ContextMenu>
                     <ContextMenu>
