@@ -15,6 +15,13 @@ namespace WinDeskBox.UI.Controls
         private ImageSource? _icon;
         private bool _isRenaming;
         private string _editingName = string.Empty;
+        private bool _isSelected;
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; OnPropertyChanged(); }
+        }
 
         public string Name
         {

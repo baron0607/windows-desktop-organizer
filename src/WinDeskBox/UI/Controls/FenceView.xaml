@@ -29,23 +29,29 @@
         MouseEnter="Window_MouseEnter"
         MouseLeave="Window_MouseLeave"
         DragEnter="Window_DragEnter"
-        Drop="Window_Drop">
+        Drop="Window_Drop"
+        PreviewKeyDown="Window_PreviewKeyDown">
 
     <Window.Resources>
         <!-- 大圖示網格項目模板 (Grid Mode) -->
         <DataTemplate x:Key="GridItemTemplate" DataType="{x:Type local:FileItemViewModel}">
             <Border x:Name="ItemBorder" Width="82" Height="86" Margin="3" CornerRadius="3" Background="Transparent"
                     BorderThickness="1" BorderBrush="Transparent"
-                    ToolTip="{Binding FullPath}" Cursor="Arrow" MouseLeftButtonDown="Item_MouseLeftButtonDown"
+                    ToolTip="{Binding FullPath}" Cursor="Arrow" 
+                    MouseLeftButtonDown="Item_MouseLeftButtonDown"
+                    PreviewMouseRightButtonDown="Item_PreviewMouseRightButtonDown"
                     SnapsToDevicePixels="True" UseLayoutRounding="True">
                 <Border.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="🚀 開啟" Click="MenuOpen_Click" />
                         <MenuItem Header="📂 在檔案總管中顯示" Click="MenuShowInExplorer_Click" />
+                        <Separator />
+                        <MenuItem Header="📑 複製 (Ctrl+C)" Click="MenuCopy_Click" />
+                        <MenuItem Header="✂️ 剪下 (Ctrl+X)" Click="MenuCut_Click" />
                         <MenuItem Header="📋 複製完整路徑" Click="MenuCopyPath_Click" />
                         <Separator />
-                        <MenuItem Header="✏️ 重新命名" Click="MenuRename_Click" />
-                        <MenuItem Header="🗑️ 移至資源回收筒" Click="MenuDelete_Click" />
+                        <MenuItem Header="✏️ 重新命名 (F2)" Click="MenuRename_Click" />
+                        <MenuItem Header="🗑️ 移至資源回收筒 (Del)" Click="MenuDelete_Click" />
                     </ContextMenu>
                 </Border.ContextMenu>
                 <Grid VerticalAlignment="Center" Margin="2" SnapsToDevicePixels="True" UseLayoutRounding="True">
@@ -79,6 +85,10 @@
                     <Setter TargetName="ItemBorder" Property="Background" Value="#25FFFFFF" />
                     <Setter TargetName="ItemBorder" Property="BorderBrush" Value="#30FFFFFF" />
                 </Trigger>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter TargetName="ItemBorder" Property="Background" Value="#350078D4" />
+                    <Setter TargetName="ItemBorder" Property="BorderBrush" Value="#800078D4" />
+                </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
 
@@ -86,16 +96,21 @@
         <DataTemplate x:Key="ListItemTemplate" DataType="{x:Type local:FileItemViewModel}">
             <Border x:Name="ItemBorder" Height="30" Margin="2,1" CornerRadius="3" Background="Transparent"
                     BorderThickness="1" BorderBrush="Transparent"
-                    ToolTip="{Binding FullPath}" Cursor="Arrow" MouseLeftButtonDown="Item_MouseLeftButtonDown"
+                    ToolTip="{Binding FullPath}" Cursor="Arrow" 
+                    MouseLeftButtonDown="Item_MouseLeftButtonDown"
+                    PreviewMouseRightButtonDown="Item_PreviewMouseRightButtonDown"
                     SnapsToDevicePixels="True" UseLayoutRounding="True">
                 <Border.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="🚀 開啟" Click="MenuOpen_Click" />
                         <MenuItem Header="📂 在檔案總管中顯示" Click="MenuShowInExplorer_Click" />
+                        <Separator />
+                        <MenuItem Header="📑 複製 (Ctrl+C)" Click="MenuCopy_Click" />
+                        <MenuItem Header="✂️ 剪下 (Ctrl+X)" Click="MenuCut_Click" />
                         <MenuItem Header="📋 複製完整路徑" Click="MenuCopyPath_Click" />
                         <Separator />
-                        <MenuItem Header="✏️ 重新命名" Click="MenuRename_Click" />
-                        <MenuItem Header="🗑️ 移至資源回收筒" Click="MenuDelete_Click" />
+                        <MenuItem Header="✏️ 重新命名 (F2)" Click="MenuRename_Click" />
+                        <MenuItem Header="🗑️ 移至資源回收筒 (Del)" Click="MenuDelete_Click" />
                     </ContextMenu>
                 </Border.ContextMenu>
                 <Grid Margin="6,0" SnapsToDevicePixels="True" UseLayoutRounding="True">
@@ -130,6 +145,10 @@
                     <Setter TargetName="ItemBorder" Property="Background" Value="#25FFFFFF" />
                     <Setter TargetName="ItemBorder" Property="BorderBrush" Value="#30FFFFFF" />
                 </Trigger>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter TargetName="ItemBorder" Property="Background" Value="#350078D4" />
+                    <Setter TargetName="ItemBorder" Property="BorderBrush" Value="#800078D4" />
+                </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
     </Window.Resources>
@@ -257,7 +276,17 @@
                 <!-- 內容區域（支援隱私解鎖盾牌層） -->
                 <Grid Grid.Row="2" SnapsToDevicePixels="True" UseLayoutRounding="True">
                     <!-- 檔案內容清單區域 -->
-                    <ScrollViewer x:Name="ContentScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="5" SnapsToDevicePixels="True" UseLayoutRounding="True">
+                    <ScrollViewer x:Name="ContentScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="5"
+                                  PreviewMouseLeftButtonDown="ContentScrollViewer_PreviewMouseLeftButtonDown"
+                                  SnapsToDevicePixels="True" UseLayoutRounding="True">
+                        <ScrollViewer.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="📋 貼上 (Ctrl+V)" Click="MenuPaste_Click" />
+                                <Separator />
+                                <MenuItem Header="🔄 重新整理 (F5)" Click="MenuRefresh_Click" />
+                                <MenuItem Header="📁 在檔案總管中開啟本機資料夾" Click="MenuOpenFolderInExplorer_Click" />
+                            </ContextMenu>
+                        </ScrollViewer.ContextMenu>
                         <ItemsControl x:Name="FilesItemsControl" SnapsToDevicePixels="True" UseLayoutRounding="True">
                             <!-- 網格模式排版容器 -->
                             <ItemsControl.ItemsPanel>

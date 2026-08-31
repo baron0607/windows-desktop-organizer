@@ -392,13 +392,50 @@ namespace WinDeskBox.UI.Controls
         }
         #endregion
 
-        #region 互動操作 (點擊開啟、右鍵選單、拖曳存入)
+        #region 互動操作 (點擊開啟、選取、複製、剪下、貼上、右鍵選單、拖曳安全複製)
         private void Item_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount == 2 && sender is FrameworkElement elem && elem.DataContext is FileItemViewModel item)
+            if (sender is FrameworkElement elem && elem.DataContext is FileItemViewModel item)
             {
-                OpenFileOrDirectory(item);
+                SelectSingleItem(item);
+                if (e.ClickCount == 2)
+                {
+                    OpenFileOrDirectory(item);
+                }
             }
+        }
+
+        private void Item_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement elem && elem.DataContext is FileItemViewModel item)
+            {
+                SelectSingleItem(item);
+            }
+        }
+
+        private void ContentScrollViewer_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource == ContentScrollViewer || (e.OriginalSource is FrameworkElement fe && fe.DataContext is not FileItemViewModel))
+            {
+                SelectSingleItem(null);
+            }
+        }
+
+        private void SelectSingleItem(FileItemViewModel? target)
+        {
+            foreach (var item in FileItems)
+            {
+                item.IsSelected = (item == target);
+            }
+        }
+
+        private FileItemViewModel? GetSelectedFileItem(object? contextSender = null)
+        {
+            if (contextSender != null && GetSelectedMenuItemContext(contextSender) is FileItemViewModel item)
+            {
+                return item;
+            }
+            return FileItems.FirstOrDefault(x => x.IsSelected);
         }
 
         private void OpenFileOrDirectory(FileItemViewModel item)
@@ -438,6 +475,34 @@ namespace WinDeskBox.UI.Controls
                     Debug.WriteLine($"無法在檔案總管中顯示: {ex.Message}");
                 }
             }
+        }
+
+        private void MenuCopy_Click(object sender, RoutedEventArgs e)
+        {
+            var item = GetSelectedFileItem(sender);
+            if (item != null)
+            {
+                ShellFileOperation.SetClipboardFiles(new[] { item.FullPath }, isCut: false);
+            }
+        }
+
+        private void MenuCut_Click(object sender, RoutedEventArgs e)
+        {
+            var item = GetSelectedFileItem(sender);
+            if (item != null)
+            {
+                ShellFileOperation.SetClipboardFiles(new[] { item.FullPath }, isCut: true);
+            }
+        }
+
+        private void MenuPaste_Click(object sender, RoutedEventArgs e)
+        {
+            PasteFromClipboard();
+        }
+
+        private void MenuRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            _ = LoadFilesAsync();
         }
 
         private void MenuCopyPath_Click(object sender, RoutedEventArgs e)
@@ -526,14 +591,156 @@ namespace WinDeskBox.UI.Controls
             }
             return null;
         }
+
+        private void PasteFromClipboard()
+        {
+            var clip = ShellFileOperation.GetClipboardFiles();
+            if (!clip.HasValue || clip.Value.files.Length == 0) return;
+
+            if (Config.ActiveTabIndex >= 0 && Config.ActiveTabIndex < Config.Tabs.Count)
+            {
+                string targetFolder = Config.Tabs[Config.ActiveTabIndex].FolderPath;
+                if (!Directory.Exists(targetFolder)) return;
+
+                bool hasPasted = false;
+                foreach (string source in clip.Value.files)
+                {
+                    try
+                    {
+                        if (!File.Exists(source) && !Directory.Exists(source)) continue;
+
+                        string fileName = Path.GetFileName(source);
+                        if (string.IsNullOrEmpty(fileName)) continue;
+
+                        string dest = Path.Combine(targetFolder, fileName);
+
+                        if (File.Exists(dest) || Directory.Exists(dest))
+                        {
+                            var dialog = new ConflictDialog(fileName);
+                            if (dialog.ShowDialog() == true)
+                            {
+                                if (dialog.Result == ConflictResolution.KeepBoth)
+                                {
+                                    dest = SafetyManager.GetSafeDestinationPath(targetFolder, fileName);
+                                }
+                                else if (dialog.Result == ConflictResolution.Skip)
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+
+                        if (clip.Value.isCut)
+                        {
+                            if (File.Exists(source))
+                            {
+                                File.Move(source, dest, overwrite: true);
+                            }
+                            else if (Directory.Exists(source))
+                            {
+                                Directory.Move(source, dest);
+                            }
+                        }
+                        else
+                        {
+                            if (File.Exists(source))
+                            {
+                                File.Copy(source, dest, overwrite: true);
+                            }
+                            else if (Directory.Exists(source))
+                            {
+                                ShellFileOperation.CopyDirectory(source, dest);
+                            }
+                        }
+                        hasPasted = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[FenceView] 貼上失敗 ({source}): {ex.Message}");
+                    }
+                }
+
+                if (hasPasted)
+                {
+                    _ = LoadFilesAsync();
+                }
+            }
+        }
+
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // 若正在進行重新命名編輯，不攔截按鍵
+            if (FileItems.Any(x => x.IsRenaming)) return;
+
+            // Ctrl + C：複製
+            if (e.Key == Key.C && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                var selected = GetSelectedFileItem();
+                if (selected != null)
+                {
+                    ShellFileOperation.SetClipboardFiles(new[] { selected.FullPath }, isCut: false);
+                    e.Handled = true;
+                }
+            }
+            // Ctrl + X：剪下
+            else if (e.Key == Key.X && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                var selected = GetSelectedFileItem();
+                if (selected != null)
+                {
+                    ShellFileOperation.SetClipboardFiles(new[] { selected.FullPath }, isCut: true);
+                    e.Handled = true;
+                }
+            }
+            // Ctrl + V：貼上
+            else if (e.Key == Key.V && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                PasteFromClipboard();
+                e.Handled = true;
+            }
+            // F2：重新命名
+            else if (e.Key == Key.F2)
+            {
+                var selected = GetSelectedFileItem();
+                if (selected != null)
+                {
+                    selected.EditingName = selected.Name;
+                    selected.IsRenaming = true;
+                    e.Handled = true;
+                }
+            }
+            // F5：重新整理
+            else if (e.Key == Key.F5)
+            {
+                _ = LoadFilesAsync();
+                e.Handled = true;
+            }
+            // Delete：移至回收筒
+            else if (e.Key == Key.Delete)
+            {
+                var selected = GetSelectedFileItem();
+                if (selected != null)
+                {
+                    if (ShellFileOperation.MoveToRecycleBin(selected.FullPath))
+                    {
+                        _ = LoadFilesAsync();
+                    }
+                    e.Handled = true;
+                }
+            }
+        }
         #endregion
 
-        #region 拖曳存入支援 (Drag and Drop)
+        #region 拖曳安全複製存入支援 (Drag and Drop - Safe Copy Mode)
         private void Window_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                e.Effects = DragDropEffects.Move | DragDropEffects.Copy;
+                e.Effects = DragDropEffects.Copy;
             }
             else
             {
@@ -557,6 +764,8 @@ namespace WinDeskBox.UI.Controls
                             try
                             {
                                 string fileName = Path.GetFileName(source);
+                                if (string.IsNullOrEmpty(fileName)) continue;
+
                                 string dest = Path.Combine(targetFolder, fileName);
 
                                 if (File.Exists(dest) || Directory.Exists(dest))
@@ -579,18 +788,19 @@ namespace WinDeskBox.UI.Controls
                                     }
                                 }
 
+                                // 採用安全複製 (Safe Copy) 模式，確保外部原始檔案完好無損
                                 if (File.Exists(source))
                                 {
-                                    File.Move(source, dest);
+                                    File.Copy(source, dest, overwrite: true);
                                 }
                                 else if (Directory.Exists(source))
                                 {
-                                    Directory.Move(source, dest);
+                                    ShellFileOperation.CopyDirectory(source, dest);
                                 }
                             }
                             catch (Exception ex)
                             {
-                                Debug.WriteLine($"[FenceView] 拖曳移動失敗 ({source}): {ex.Message}");
+                                Debug.WriteLine($"[FenceView] 拖曳複製失敗 ({source}): {ex.Message}");
                             }
                         }
                         _ = LoadFilesAsync();
