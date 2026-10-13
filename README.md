@@ -18,6 +18,24 @@
 
 ---
 
+## 📸 軟體介面預覽 (Screenshots)
+
+### 📦 桌面收納盒 (Fence View)
+*支援 Fluent Acrylic 半透明毛玻璃質感、Windows 原生 256×256 高畫質無損圖示、標題列快捷功能與 8 向邊框自由拉伸縮放*
+
+<p align="center">
+  <img src="docs/screenshots/fence-ui.png" alt="WinDeskBox 桌面收納盒介面" width="850">
+</p>
+
+### ⚙️ 視覺化設定中心 (Settings View)
+*直覺管理收納盒與本機資料夾映射 (Folder Portal)、多分頁 (Tabs)、全域快捷鍵、開機自動啟動與桌面一鍵整理工具*
+
+<p align="center">
+  <img src="docs/screenshots/settings-ui.png" alt="WinDeskBox 設定中心介面" width="800">
+</p>
+
+---
+
 ## 🌟 核心特色 (Key Features)
 
 ### 1. 📁 自訂資料夾映射收納盒 (Folder Portal)
